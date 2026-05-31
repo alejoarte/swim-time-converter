@@ -4,6 +4,7 @@ import { formatTime } from '../lib/timeParse'
 type BulkResultsTableProps = {
   results: BulkConversionResult[]
   sourceCourse: Course
+  onBack: () => void
   onExport: () => void
   onImportAnother: () => void
 }
@@ -13,6 +14,7 @@ const COURSES: Course[] = ['SCY', 'SCM', 'LCM']
 export function BulkResultsTable({
   results,
   sourceCourse,
+  onBack,
   onExport,
   onImportAnother,
 }: BulkResultsTableProps) {
@@ -23,6 +25,9 @@ export function BulkResultsTable({
       <div className="section-header">
         <h2>Meet conversions ({results.length} rows)</h2>
         <div className="button-group">
+          <button type="button" className="secondary" onClick={onBack}>
+            Back to review
+          </button>
           <button type="button" className="secondary" onClick={onImportAnother}>
             Import another PDF
           </button>

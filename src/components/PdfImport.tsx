@@ -119,6 +119,11 @@ export function PdfImport() {
     }
   }
 
+  const handleBackToPreview = () => {
+    setResults(null)
+    setStep('preview')
+  }
+
   return (
     <div className="pdf-import">
       {step === 'upload' && (
@@ -190,6 +195,7 @@ export function PdfImport() {
           <BulkResultsTable
             results={results}
             sourceCourse={sourceCourse}
+            onBack={handleBackToPreview}
             onExport={handleExport}
             onImportAnother={reset}
           />
