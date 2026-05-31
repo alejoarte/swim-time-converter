@@ -1,0 +1,217 @@
+import { getEventById, type Stroke, type SwimEvent } from '../data/events'
+
+export type Course = 'SCY' | 'SCM' | 'LCM'
+
+const STROKE_INCRE: Record<Stroke, number> = {
+  fly: 70,
+  back: 60,
+  breast: 100,
+  free: 80,
+  im: 80,
+}
+
+function isDistanceFreeEvent(event: SwimEvent): boolean {
+  return event.distance === 500 || event.distance === 1000 || event.distance === 1650
+}
+
+function isScyLcmDistancePair(event: SwimEvent): boolean {
+  return isDistanceFreeEvent(event) || (event.stroke === 'im' && event.distance === 400)
+}
+
+/** fFactor for Classical (Colorado Timing) conversion. */
+export function getFFactor(from: Course, to: Course, event: SwimEvent): number {
+  if (from === 'SCM' && to === 'LCM') return 1.0
+  if (from === 'LCM' && to === 'SCM') return 1.0
+
+  if (isScyLcmDistancePair(event)) {
+    if (event.distance === 500 || event.distance === 1000) return 0.8925
+    if (event.distance === 1650 || event.distance === 400) {
+      if (event.stroke === 'im') return 0.8925
+      if (event.distance === 1650) return 1.02
+    }
+  }
+
+  return 1.11
+}
+
+function strokeDistanceIncre(event: SwimEvent): number {
+  const incre = STROKE_INCRE[event.stroke]
+  if (event.distance === 50) return incre
+  if (event.distance === 100) return 2 * incre
+  if (event.distance === 200) return 4 * incre
+  if (event.distance === 400) return 8 * incre
+  return 0
+}
+
+function lcmScmDistanceIncre(event: SwimEvent): number | null {
+  if (event.distance === 500 || event.distance === 400) return 640
+  if (event.distance === 1000 || event.distance === 800) return 1280
+  if (event.distance === 1650 || event.distance === 1500) return 2400
+  return null
+}
+
+/** fIncre in centiseconds for Classical (Colorado Timing) conversion. */
+export function getFIncre(from: Course, to: Course, event: SwimEvent): number {
+  const involvesScy = from === 'SCY' || to === 'SCY'
+  const involvesScm = from === 'SCM' || to === 'SCM'
+  const involvesLcm = from === 'LCM' || to === 'LCM'
+
+  if (involvesScy && involvesScm && !involvesLcm) {
+    return 0
+  }
+
+  if (involvesLcm && involvesScm && !involvesScy) {
+    const distanceIncre = lcmScmDistanceIncre(event)
+    if (distanceIncre !== null) return distanceIncre
+    return strokeDistanceIncre(event)
+  }
+
+  if (involvesScy && involvesLcm) {
+    if (event.stroke === 'im' && event.distance === 400) return 640
+    if (isDistanceFreeEvent(event)) {
+      if (event.distance === 500) return 640
+      if (event.distance === 1000) return 1280
+      if (event.distance === 1650) return 2400
+    }
+    if (event.distance <= 200) return strokeDistanceIncre(event)
+    return 0
+  }
+
+  return 0
+}
+
+function convertDirect(
+  hsecs: number,
+  from: Course,
+  to: Course,
+  event: SwimEvent,
+): number {
+  const fFactor = getFFactor(from, to, event)
+  const fIncre = getFIncre(from, to, event)
+
+  if (from === 'SCY' && (to === 'LCM' || to === 'SCM')) {
+    return hsecs * fFactor + fIncre
+  }
+  if (from === 'LCM' && (to === 'SCY' || to === 'SCM')) {
+    return (hsecs - fIncre) / fFactor
+  }
+  if (from === 'SCM' && to === 'SCY') {
+    return hsecs / fFactor
+  }
+  if (from === 'SCM' && to === 'LCM') {
+    return hsecs + fIncre
+  }
+  if (from === 'LCM' && to === 'SCM') {
+    return (hsecs - fIncre) / fFactor
+  }
+
+  throw new Error(`Unsupported direct conversion: ${from} → ${to}`)
+}
+
+/** Convert time in centiseconds between courses using Classical (Colorado Timing) factors. */
+export function convertCentiseconds(
+  hsecs: number,
+  from: Course,
+  to: Course,
+  event: SwimEvent,
+): number {
+  if (from === to) return hsecs
+
+  const directPairs: [Course, Course][] = [
+    ['SCY', 'LCM'],
+    ['SCY', 'SCM'],
+    ['LCM', 'SCY'],
+    ['LCM', 'SCM'],
+    ['SCM', 'SCY'],
+    ['SCM', 'LCM'],
+  ]
+
+  for (const [f, t] of directPairs) {
+    if (from === f && to === t) {
+      return convertDirect(hsecs, from, to, event)
+    }
+  }
+
+  const viaLcm = convertCentiseconds(hsecs, from, 'LCM', event)
+  return convertCentiseconds(viaLcm, 'LCM', to, event)
+}
+
+export type ConversionResult = {
+  eventId: string
+  eventLabel: string
+  sourceCourse: Course
+  sourceCentiseconds: number
+  SCY: number
+  SCM: number
+  LCM: number
+}
+
+export function convertEntry(
+  event: SwimEvent,
+  sourceCourse: Course,
+  sourceCentiseconds: number,
+): ConversionResult {
+  const courses: Course[] = ['SCY', 'SCM', 'LCM']
+  const converted: Record<Course, number> = {
+    SCY: 0,
+    SCM: 0,
+    LCM: 0,
+  }
+
+  for (const course of courses) {
+    converted[course] = convertCentiseconds(
+      sourceCentiseconds,
+      sourceCourse,
+      course,
+      event,
+    )
+  }
+
+  return {
+    eventId: event.id,
+    eventLabel: event.label,
+    sourceCourse,
+    sourceCentiseconds,
+    SCY: converted.SCY,
+    SCM: converted.SCM,
+    LCM: converted.LCM,
+  }
+}
+
+export type BulkConversionResult = ConversionResult & {
+  swimmerName: string
+  age?: number
+  team?: string
+  lane?: number
+  rawTime: string
+}
+
+export type BulkConvertInput = {
+  eventId: string
+  sourceCourse: Course
+  sourceCentiseconds: number
+  swimmerName: string
+  age?: number
+  team?: string
+  lane?: number
+  rawTime: string
+}
+
+export function convertBulkRows(rows: BulkConvertInput[]): BulkConversionResult[] {
+  return rows.flatMap((row) => {
+    const event = getEventById(row.eventId)
+    if (!event) return []
+
+    const converted = convertEntry(event, row.sourceCourse, row.sourceCentiseconds)
+    return [
+      {
+        ...converted,
+        swimmerName: row.swimmerName,
+        age: row.age,
+        team: row.team,
+        lane: row.lane,
+        rawTime: row.rawTime,
+      },
+    ]
+  })
+}
