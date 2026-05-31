@@ -5,6 +5,7 @@ type CourseSelectorProps = {
   onChange: (course: Course) => void
   disabled?: boolean
   heading?: string
+  name?: string
 }
 
 const COURSES: { value: Course; label: string; description: string }[] = [
@@ -13,16 +14,22 @@ const COURSES: { value: Course; label: string; description: string }[] = [
   { value: 'LCM', label: 'LCM', description: 'Long Course Meters' },
 ]
 
-export function CourseSelector({ value, onChange, disabled, heading = 'My times are in' }: CourseSelectorProps) {
+export function CourseSelector({
+  value,
+  onChange,
+  disabled,
+  heading = 'My times are in',
+  name = 'source-course',
+}: CourseSelectorProps) {
   return (
     <section className="course-selector">
       <h2>{heading}</h2>
-      <div className="course-options" role="radiogroup" aria-label="My times are in">
+      <div className="course-options" role="radiogroup" aria-label={heading}>
         {COURSES.map((course) => (
           <label key={course.value} className="course-option">
             <input
               type="radio"
-              name="source-course"
+              name={name}
               value={course.value}
               checked={value === course.value}
               onChange={() => onChange(course.value)}

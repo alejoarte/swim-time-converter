@@ -34,14 +34,17 @@ export function TimeFields({
   disabled,
   showErrors,
 }: TimeFieldsProps) {
-  const secondsRef = useRef<HTMLInputElement>(null)
+  const groupRef = useRef<HTMLDivElement>(null)
   const hundredthsRef = useRef<HTMLInputElement>(null)
+  const latestPartsRef = useRef(value)
+  latestPartsRef.current = value
 
   const error = showErrors ? getTimePartsError(value) : null
   const errorMessage = error ? ERROR_MESSAGES[error] : null
 
   const handleChange = (part: TimePart, raw: string, maxLength: number) => {
     const next = digitsOnly(raw, maxLength)
+    latestPartsRef.current = { ...latestPartsRef.current, [part]: next }
     onChange(part, next)
 
     if (part === 'seconds' && next.length >= 2) {
@@ -52,8 +55,12 @@ export function TimeFields({
     }
   }
 
-  const handleBlur = () => {
-    onNormalize(normalizeTimeParts(value))
+  const handleFieldBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const nextTarget = e.relatedTarget
+    if (nextTarget instanceof Node && groupRef.current?.contains(nextTarget)) {
+      return
+    }
+    onNormalize(normalizeTimeParts(latestPartsRef.current))
   }
 
   const invalidSeconds =
@@ -70,6 +77,7 @@ export function TimeFields({
   return (
     <div className="time-fields-wrap">
       <div
+        ref={groupRef}
         className="time-fields"
         role="group"
         aria-label="Swim time"
@@ -88,7 +96,7 @@ export function TimeFields({
             placeholder="0"
             value={value.minutes}
             onChange={(e) => handleChange('minutes', e.target.value, 3)}
-            onBlur={handleBlur}
+            onBlur={handleFieldBlur}
             disabled={disabled}
             enterKeyHint="next"
             aria-invalid={invalidMinutes}
@@ -102,7 +110,6 @@ export function TimeFields({
             Sec
           </label>
           <input
-            ref={secondsRef}
             id={`${idPrefix}-sec`}
             type="text"
             inputMode="numeric"
@@ -111,7 +118,7 @@ export function TimeFields({
             placeholder="00"
             value={value.seconds}
             onChange={(e) => handleChange('seconds', e.target.value, 2)}
-            onBlur={handleBlur}
+            onBlur={handleFieldBlur}
             disabled={disabled}
             enterKeyHint="next"
             aria-invalid={invalidSeconds}
@@ -134,7 +141,7 @@ export function TimeFields({
             placeholder="00"
             value={value.hundredths}
             onChange={(e) => handleChange('hundredths', e.target.value, 2)}
-            onBlur={handleBlur}
+            onBlur={handleFieldBlur}
             disabled={disabled}
             enterKeyHint="done"
             aria-invalid={invalidHundredths}

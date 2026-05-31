@@ -13,10 +13,14 @@ import {
   type TimeParts,
 } from './lib/timeParse'
 
-type AppMode = 'manual' | 'import'
+type AppMode = 'manual' | 'import' | 'plan'
 
 const PdfImport = lazy(() =>
   import('./components/PdfImport').then((m) => ({ default: m.PdfImport })),
+)
+
+const PlanTraining = lazy(() =>
+  import('./components/PlanTraining').then((m) => ({ default: m.PlanTraining })),
 )
 
 function App() {
@@ -124,12 +128,25 @@ function App() {
         >
           Import PDF
         </button>
+        <button
+          type="button"
+          className={mode === 'plan' ? 'mode-switch-btn mode-switch-btn--active' : 'mode-switch-btn'}
+          onClick={() => setMode('plan')}
+        >
+          Plan training
+        </button>
       </nav>
 
       {mode === 'import' ? (
         <div className="app-main">
           <Suspense fallback={<p className="hint">Loading PDF import…</p>}>
             <PdfImport />
+          </Suspense>
+        </div>
+      ) : mode === 'plan' ? (
+        <div className="app-main">
+          <Suspense fallback={<p className="hint">Loading plan training…</p>}>
+            <PlanTraining />
           </Suspense>
         </div>
       ) : (

@@ -16,6 +16,18 @@ body {
   min-height: 100vh;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .app {
   max-width: 900px;
   margin: 0 auto;
@@ -757,4 +769,266 @@ th {
   margin: 0;
   font-size: 0.8rem;
   color: #78909c;
+}
+
+.plan-training section {
+  margin-bottom: 1.25rem;
+}
+
+.event-select-section h2,
+.goal-time-section h2,
+.zone-system-section h2,
+.pace-model-section h2,
+.training-zones h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.plan-time-hint--above {
+  margin: 0 0 0.5rem;
+}
+
+.event-select,
+.zone-system-select {
+  display: block;
+  width: 100%;
+  max-width: 28rem;
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.5rem;
+  border: 1px solid #cfd8dc;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.event-select {
+  max-width: 20rem;
+}
+
+.plan-results {
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  background: #e3f2fd;
+  border-left: 4px solid #0d47a1;
+}
+
+.plan-summary {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #90caf9;
+}
+
+.plan-summary p {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.plan-summary-reference {
+  font-size: 0.88rem !important;
+  color: #546e7a;
+}
+
+.training-zones {
+  margin-top: 0.5rem;
+}
+
+.training-zones-callout {
+  margin: 0 0 0.75rem;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  background: #fff;
+  border: 1px solid #90caf9;
+  border-radius: 6px;
+}
+
+.training-zones-callout p {
+  margin: 0 0 0.4rem;
+}
+
+.training-zones-callout p:last-child {
+  margin-bottom: 0;
+}
+
+.pace-model-fieldset {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.pace-model-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+  max-width: 32rem;
+  cursor: pointer;
+}
+
+.pace-model-option:last-child {
+  margin-bottom: 0;
+}
+
+.pace-model-option input {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.pace-model-option-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.9rem;
+}
+
+.pace-model-option-desc {
+  font-size: 0.82rem;
+  color: #546e7a;
+  font-weight: normal;
+}
+
+.training-zones-reliability {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  margin-bottom: 0.2rem;
+}
+
+.training-zones-reliability--high {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.training-zones-reliability--moderate {
+  background: #fff8e1;
+  color: #f57f17;
+}
+
+.training-zones-reliability--low {
+  background: #fce4ec;
+  color: #c62828;
+}
+
+.training-zones-reliability-note {
+  display: block;
+  font-size: 0.75rem;
+  color: #546e7a;
+  line-height: 1.35;
+}
+
+.training-zones-hint {
+  margin: 0 0 0.75rem;
+}
+
+.training-zones-table {
+  font-size: 0.82rem;
+}
+
+.training-zones-table th,
+.training-zones-table td {
+  vertical-align: top;
+}
+
+.training-zones-name {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: normal;
+  color: #546e7a;
+}
+
+.training-zones-row--race {
+  background: #e3f2fd;
+}
+
+.training-zones-row--race td {
+  font-weight: 600;
+}
+
+.training-zones-pace--race {
+  color: #0d47a1;
+}
+
+.plan-results-highlight {
+  color: #0d47a1;
+}
+
+.plan-results-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  color: #546e7a;
+}
+
+.plan-results-disclaimer {
+  font-style: italic;
+  color: #78909c;
+}
+
+.plan-print-meta {
+  display: none;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.plan-print-meta p {
+  margin: 0 0 0.25rem;
+}
+
+.plan-print-meta-system {
+  color: #546e7a;
+  font-size: 0.85rem;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .app-header,
+  .mode-switch,
+  .app-footer,
+  .plan-training > section:not(.plan-print-area),
+  .plan-training .zone-system-section,
+  .plan-training .pace-model-section,
+  .plan-training .event-select-section,
+  .plan-training .course-selector,
+  .plan-summary.no-print-duplicate,
+  .training-zones .section-header,
+  .training-zones-hint {
+    display: none !important;
+  }
+
+  .app {
+    max-width: none;
+    padding: 0;
+  }
+
+  .plan-print-area {
+    background: #fff;
+    border: none;
+    padding: 0;
+  }
+
+  .plan-print-meta {
+    display: block;
+  }
+
+  .training-zones-table {
+    font-size: 10pt;
+  }
+
+  .training-zones-row--race {
+    background: #eee !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .table-wrapper {
+    max-height: none;
+    overflow: visible;
+  }
 }
