@@ -295,6 +295,22 @@ body {
   font-weight: 600;
 }
 
+.issues-review-tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.issues-review-tab {
+  flex: 1;
+}
+
+.issues-review-tab--active {
+  font-weight: 600;
+  color: #1565c0;
+  background: #e3f2fd;
+  border-color: #90caf9;
+}
+
 .issues-review-toolbar {
   flex-wrap: wrap;
 }

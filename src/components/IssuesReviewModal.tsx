@@ -8,6 +8,8 @@ import {
 import type { ParsedRow, ParseRowStatus } from '../lib/parsePdf/types'
 import { revalidateParsedRow } from '../lib/revalidateParsedRow'
 
+type IssueTab = 'errors' | 'warnings'
+
 type IssuesReviewModalProps = {
   open: boolean
   onClose: () => void
@@ -132,12 +134,18 @@ export function IssuesReviewModal({ open, onClose, rows, onConfirm }: IssuesRevi
   const [originalStatusById, setOriginalStatusById] = useState<Map<string, ParseRowStatus>>(
     new Map(),
   )
+  const [activeTab, setActiveTab] = useState<IssueTab>('errors')
 
   useEffect(() => {
     if (!open) return
 
-    setDraftRows(cloneRows(rows))
-    setOriginalStatusById(new Map(rows.map((row) => [row.id, row.status])))
+    const cloned = cloneRows(rows)
+    const statusMap = new Map(rows.map((row) => [row.id, row.status]))
+    const errorCount = getRowsByOriginalStatus(cloned, statusMap, 'error').length
+
+    setDraftRows(cloned)
+    setOriginalStatusById(statusMap)
+    setActiveTab(errorCount > 0 ? 'errors' : 'warnings')
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -157,6 +165,8 @@ export function IssuesReviewModal({ open, onClose, rows, onConfirm }: IssuesRevi
     () => getRowsByOriginalStatus(draftRows, originalStatusById, 'warning'),
     [draftRows, originalStatusById],
   )
+  const showTabs = errorRows.length > 0 && warningRows.length > 0
+  const visibleRows = activeTab === 'errors' ? errorRows : warningRows
   const includedCount = countConvertibleRows(draftRows)
 
   if (!open) return null
@@ -182,17 +192,23 @@ export function IssuesReviewModal({ open, onClose, rows, onConfirm }: IssuesRevi
   const includeAllWarnings = () => {
     setDraftRows((current) =>
       current.map((row) =>
-        row.status === 'warning' ? { ...row, included: true } : row,
+        originalStatusById.get(row.id) === 'warning' ? { ...row, included: true } : row,
       ),
     )
   }
 
-  const excludeAllIssues = () => {
+  const excludeAllErrors = () => {
     setDraftRows((current) =>
       current.map((row) =>
-        row.status === 'warning' || row.status === 'error'
-          ? { ...row, included: false }
-          : row,
+        originalStatusById.get(row.id) === 'error' ? { ...row, included: false } : row,
+      ),
+    )
+  }
+
+  const excludeAllWarnings = () => {
+    setDraftRows((current) =>
+      current.map((row) =>
+        originalStatusById.get(row.id) === 'warning' ? { ...row, included: false } : row,
       ),
     )
   }
@@ -200,7 +216,9 @@ export function IssuesReviewModal({ open, onClose, rows, onConfirm }: IssuesRevi
   const includeAllFixable = () => {
     setDraftRows((current) =>
       current.map((row) =>
-        row.status !== 'error' ? { ...row, included: true } : row,
+        originalStatusById.get(row.id) === 'error' && row.status !== 'error'
+          ? { ...row, included: true }
+          : row,
       ),
     )
   }
@@ -236,47 +254,81 @@ export function IssuesReviewModal({ open, onClose, rows, onConfirm }: IssuesRevi
             {formatIssueSummary(errorRows.length, warningRows.length)} found in this import.
           </p>
 
+          {showTabs && (
+            <div className="issues-review-tabs" role="tablist" aria-label="Issue type">
+              <button
+                type="button"
+                role="tab"
+                id="issues-tab-errors"
+                aria-selected={activeTab === 'errors'}
+                aria-controls="issues-tabpanel"
+                className={`issues-review-tab secondary${activeTab === 'errors' ? ' issues-review-tab--active' : ''}`}
+                onClick={() => setActiveTab('errors')}
+              >
+                Errors ({errorRows.length})
+              </button>
+              <button
+                type="button"
+                role="tab"
+                id="issues-tab-warnings"
+                aria-selected={activeTab === 'warnings'}
+                aria-controls="issues-tabpanel"
+                className={`issues-review-tab secondary${activeTab === 'warnings' ? ' issues-review-tab--active' : ''}`}
+                onClick={() => setActiveTab('warnings')}
+              >
+                Warnings ({warningRows.length})
+              </button>
+            </div>
+          )}
+
           <div className="issues-review-toolbar button-group">
-            <button type="button" className="secondary" onClick={includeAllWarnings}>
-              Include all warnings
-            </button>
-            <button type="button" className="secondary" onClick={excludeAllIssues}>
-              Exclude all issues
-            </button>
-            <button type="button" className="secondary" onClick={includeAllFixable}>
-              Include all fixable
-            </button>
+            {activeTab === 'errors' ? (
+              <>
+                <button type="button" className="secondary" onClick={excludeAllErrors}>
+                  Exclude all errors
+                </button>
+                <button type="button" className="secondary" onClick={includeAllFixable}>
+                  Include all fixable
+                </button>
+              </>
+            ) : (
+              <>
+                <button type="button" className="secondary" onClick={includeAllWarnings}>
+                  Include all warnings
+                </button>
+                <button type="button" className="secondary" onClick={excludeAllWarnings}>
+                  Exclude all warnings
+                </button>
+              </>
+            )}
           </div>
 
-          {errorRows.length > 0 && (
-            <section className="issues-review-section">
-              <h3 className="issues-review-section-title">Errors ({errorRows.length})</h3>
+          <section
+            id="issues-tabpanel"
+            role="tabpanel"
+            aria-labelledby={activeTab === 'errors' ? 'issues-tab-errors' : 'issues-tab-warnings'}
+            className="issues-review-section"
+          >
+            {!showTabs && (
+              <h3 className="issues-review-section-title">
+                {activeTab === 'errors'
+                  ? `Errors (${errorRows.length})`
+                  : `Warnings (${warningRows.length})`}
+              </h3>
+            )}
+            {activeTab === 'errors' && (
               <p className="hint hint--warning">
                 Fix event or time to resolve errors. Include is enabled once a row is
                 fixable.
               </p>
-              <IssueTable
-                sectionRows={errorRows}
-                originalStatusById={originalStatusById}
-                onUpdateRow={updateDraftRow}
-                onToggleIncluded={toggleDraftIncluded}
-              />
-            </section>
-          )}
-
-          {warningRows.length > 0 && (
-            <section className="issues-review-section">
-              <h3 className="issues-review-section-title">
-                Warnings ({warningRows.length})
-              </h3>
-              <IssueTable
-                sectionRows={warningRows}
-                originalStatusById={originalStatusById}
-                onUpdateRow={updateDraftRow}
-                onToggleIncluded={toggleDraftIncluded}
-              />
-            </section>
-          )}
+            )}
+            <IssueTable
+              sectionRows={visibleRows}
+              originalStatusById={originalStatusById}
+              onUpdateRow={updateDraftRow}
+              onToggleIncluded={toggleDraftIncluded}
+            />
+          </section>
         </div>
 
         <footer className="modal-footer">
