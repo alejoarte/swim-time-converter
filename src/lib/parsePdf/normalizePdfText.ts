@@ -1,9 +1,11 @@
 const PAGE_FOOTER = /^--\s*\d+\s+of\s+\d+\s*--$/i
 const PAGE_HEADER =
   /^(Federacion|HY-TEK'?s?\s+MEET MANAGER|Meet Program|Programa de Competencias)/i
+const PIPE_SEPARATOR = /^\|[\s\-|]+\|$|^[\|\s\-]+$/
 
 export function normalizePdfText(raw: string): string[] {
   return raw
+    .replace(/^\uFEFF/, '')
     .replace(/\r\n/g, '\n')
     .replace(/\r/g, '\n')
     .split('\n')
@@ -11,6 +13,7 @@ export function normalizePdfText(raw: string): string[] {
     .filter((line) => {
       if (!line) return false
       if (PAGE_FOOTER.test(line)) return false
+      if (PIPE_SEPARATOR.test(line)) return false
       if (
         PAGE_HEADER.test(line) &&
         !line.startsWith('Event ') &&

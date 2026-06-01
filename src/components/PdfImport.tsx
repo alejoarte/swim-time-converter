@@ -1,13 +1,23 @@
 import { useCallback, useState } from 'react'
+import { ColumnMapperStep, LAYOUT_CONFIDENCE_MAPPER_THRESHOLD } from './ColumnMapperStep'
+import { PdfPreview } from './PdfPreview'
 import { CourseSelector } from './CourseSelector'
 import { BulkResultsTable } from './BulkResultsTable'
 import { ImportPreviewTable } from './ImportPreviewTable'
 import { convertBulkRows, type BulkConversionResult, type Course } from '../lib/convert'
 import { exportMeetToExcel } from '../lib/exportExcel'
-import { extractPdfText, parsePdfText } from '../lib/parsePdf'
-import type { ParsedRow } from '../lib/parsePdf/types'
+import {
+  extractPdfTextWithPositions,
+  parsePdfText,
+  suggestMappingConfig,
+} from '../lib/parsePdf'
+import type { PdfTextLine } from '../lib/parsePdf/buildPdfLines'
+import { isLikelyScannedPdf } from '../lib/parsePdf/columnMapping/isLikelyScannedPdf'
+import type { ColumnMappingConfig, ColumnMappingResult } from '../lib/parsePdf/columnMapping/types'
+import type { ColumnProfileResult } from '../lib/parsePdf/columnMapping/inferColumnProfile'
+import type { ParsedRow, ParsePdfResult, RowLayoutId } from '../lib/parsePdf/types'
 
-type ImportStep = 'upload' | 'preview' | 'results'
+type ImportStep = 'upload' | 'mapper' | 'preview' | 'results' | 'scanned'
 
 export function PdfImport() {
   const [step, setStep] = useState<ImportStep>('upload')
@@ -20,6 +30,15 @@ export function PdfImport() {
   const [rows, setRows] = useState<ParsedRow[]>([])
   const [results, setResults] = useState<BulkConversionResult[] | null>(null)
   const [dragOver, setDragOver] = useState(false)
+  const [rawText, setRawText] = useState('')
+  const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [pdfLines, setPdfLines] = useState<PdfTextLine[]>([])
+  const [mappingConfig, setMappingConfig] = useState<ColumnMappingConfig | null>(null)
+  const [columnProfile, setColumnProfile] = useState<ColumnProfileResult | null>(null)
+  const [autoParseResult, setAutoParseResult] = useState<ParsePdfResult | null>(null)
+  const [inferredLayoutId, setInferredLayoutId] = useState<RowLayoutId | undefined>()
+  const [inferredLayoutConfidence, setInferredLayoutConfidence] = useState<number | undefined>()
+  const [canManualMap, setCanManualMap] = useState(false)
 
   const reset = useCallback(() => {
     setStep('upload')
@@ -31,7 +50,42 @@ export function PdfImport() {
     setSourceCourse('LCM')
     setRows([])
     setResults(null)
+    setRawText('')
+    setPdfFile(null)
+    setPdfLines([])
+    setMappingConfig(null)
+    setColumnProfile(null)
+    setAutoParseResult(null)
+    setInferredLayoutId(undefined)
+    setInferredLayoutConfidence(undefined)
+    setCanManualMap(false)
   }, [])
+
+  const openMapper = useCallback(
+    (text: string, parsed: ParsePdfResult | null) => {
+      const suggestion = suggestMappingConfig(text)
+      setMappingConfig(suggestion.config)
+      setColumnProfile(suggestion.columnProfile)
+      setInferredLayoutId(suggestion.inferredLayoutId)
+      setInferredLayoutConfidence(suggestion.inferredLayoutConfidence)
+      setAutoParseResult(parsed)
+      setParseWarnings(parsed?.warnings ?? [])
+      setStep('mapper')
+      setError(null)
+    },
+    [],
+  )
+
+  const shouldUseMapper = (parsed: ParsePdfResult): boolean => {
+    if (parsed.rows.length === 0) return true
+    if (
+      parsed.layoutConfidence !== undefined &&
+      parsed.layoutConfidence < LAYOUT_CONFIDENCE_MAPPER_THRESHOLD
+    ) {
+      return true
+    }
+    return false
+  }
 
   const processFile = async (file: File) => {
     if (!file.name.toLowerCase().endsWith('.pdf')) {
@@ -42,15 +96,34 @@ export function PdfImport() {
     setLoading(true)
     setError(null)
     setFileName(file.name)
+    setPdfFile(file)
     setResults(null)
+    setCanManualMap(false)
 
     try {
-      const text = await extractPdfText(file)
-      const parsed = parsePdfText(text)
+      const extraction = await extractPdfTextWithPositions(file)
+      const text = extraction.text
+      setRawText(text)
+      setPdfLines(extraction.lines)
 
-      if (parsed.rows.length === 0) {
-        setError(parsed.warnings[0] ?? 'No swimmer rows found in this PDF.')
-        setStep('upload')
+      if (isLikelyScannedPdf(text)) {
+        setError(
+          'This PDF appears to be scanned or image-only. Text extraction found little usable content. Try a text-based Hy-Tek export or use the CSV template for manual entry.',
+        )
+        setStep('scanned')
+        return
+      }
+
+      const parsed = parsePdfText(text)
+      setAutoParseResult(parsed)
+
+      if (shouldUseMapper(parsed)) {
+        setCanManualMap(true)
+        setError(
+          parsed.warnings[0] ??
+            'No swimmer rows found. Try mapping columns manually or use the CSV template.',
+        )
+        openMapper(text, parsed)
         return
       }
 
@@ -63,10 +136,25 @@ export function PdfImport() {
       setStep('preview')
     } catch {
       setError('Failed to read PDF. The file may be corrupted or password-protected.')
+      setPdfFile(null)
+      setPdfLines([])
       setStep('upload')
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleMapperApply = (result: ColumnMappingResult) => {
+    setRows(result.rows)
+    setMeetTitle(result.meetInfo.title)
+    setParseWarnings(result.warnings)
+    if (result.meetInfo.detectedCourse) {
+      setSourceCourse(result.meetInfo.detectedCourse)
+    } else if (result.mappingConfig.meetDefaultCourse) {
+      setSourceCourse(result.mappingConfig.meetDefaultCourse)
+    }
+    setMappingConfig(result.mappingConfig)
+    setStep('preview')
   }
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,14 +212,20 @@ export function PdfImport() {
     setStep('preview')
   }
 
+  const handleManualMap = () => {
+    if (rawText) {
+      openMapper(rawText, autoParseResult)
+    }
+  }
+
   return (
     <div className="pdf-import">
       {step === 'upload' && (
         <section className="pdf-upload">
           <h2>Import meet PDF</h2>
           <p className="hint">
-            Upload a Hy-Tek Meet Manager text PDF (English or Spanish layout). Scanned PDFs
-            and other formats are not supported yet.
+            Upload a Hy-Tek Meet Manager text PDF (meet program or results). If auto-parse
+            fails, you can match columns using a preview of your document.
           </p>
 
           <div
@@ -155,8 +249,54 @@ export function PdfImport() {
             </label>
           </div>
 
-          {error && <p className="field-error">{error}</p>}
+          {error && (
+            <div className="upload-error-block">
+              <p className="field-error">{error}</p>
+              {canManualMap && rawText && (
+                <button type="button" className="primary" onClick={handleManualMap}>
+                  Match columns
+                </button>
+              )}
+              <p className="hint">
+                Or enter times using the CSV template in the manual converter (spreadsheet
+                export).
+              </p>
+            </div>
+          )}
         </section>
+      )}
+
+      {step === 'scanned' && (
+        <section className="pdf-scanned">
+          <div className="section-header">
+            <h2>{fileName ?? 'PDF preview'}</h2>
+            <button type="button" className="secondary" onClick={reset}>
+              Choose another file
+            </button>
+          </div>
+          <p className="field-error">{error}</p>
+          <p className="hint">
+            This document is image-only — we cannot extract swimmer names or times from it.
+            Export a text-based PDF from Hy-Tek, or use the CSV template.
+          </p>
+          <PdfPreview file={pdfFile} />
+        </section>
+      )}
+
+      {step === 'mapper' && mappingConfig && (
+        <ColumnMapperStep
+          rawText={rawText}
+          fileName={fileName}
+          pdfFile={pdfFile}
+          pdfLines={pdfLines}
+          initialConfig={mappingConfig}
+          initialColumnProfile={columnProfile}
+          inferredLayoutId={inferredLayoutId}
+          inferredLayoutConfidence={inferredLayoutConfidence}
+          autoParseWarnings={autoParseResult?.warnings}
+          onApply={handleMapperApply}
+          onBack={() => setStep('upload')}
+        />
       )}
 
       {step === 'preview' && (
@@ -164,9 +304,20 @@ export function PdfImport() {
           <section className="import-summary">
             <div className="section-header">
               <h2>{fileName ?? 'Imported PDF'}</h2>
-              <button type="button" className="secondary" onClick={reset}>
-                Choose another file
-              </button>
+              <div className="section-header-actions">
+                {rawText && (
+                  <button
+                    type="button"
+                    className="secondary"
+                    onClick={() => openMapper(rawText, autoParseResult)}
+                  >
+                    Remap columns
+                  </button>
+                )}
+                <button type="button" className="secondary" onClick={reset}>
+                  Choose another file
+                </button>
+              </div>
             </div>
             {meetTitle && <p className="meet-title">{meetTitle}</p>}
             {parseWarnings.map((warning) => (

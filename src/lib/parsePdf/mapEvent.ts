@@ -19,6 +19,7 @@ const STROKE_ALIASES: Record<string, string> = {
   combinado: 'im',
   'combinado individual': 'im',
   'combinado relevo': 'im',
+  ci: 'im',
 }
 
 const STROKE_KEYS_BY_LENGTH = Object.keys(STROKE_ALIASES).sort(
@@ -62,7 +63,7 @@ export type ParsedEventTitle = {
 }
 
 const EVENT_TITLE_FRAGMENT =
-  /(\d{2,4})\s+(SC|LC|CL)\s+(Metro|Yard|Yards|Yarda?s?)\s+(.+)$/i
+  /(\d{2,4})\s+(SC|LC|CL)\s+(Metro|Meter|Meters|Yard|Yards|Yarda?s?)\s+(.+)$/i
 
 export function parseHyTekEventTitle(text: string): ParsedEventTitle | null {
   if (isRelayEventText(text)) {
@@ -144,4 +145,67 @@ export function formatEventLabel(eventId: string): string {
   const stroke = strokeMap[parts[parts.length - 1]] ?? parts[parts.length - 1]
   const distance = parts.slice(0, -1).join('-')
   return `${distance} ${stroke}`
+}
+
+const RESULTS_EVENT_TITLE =
+  /^(?:Women|Men|W|M|Hombres|Mujeres)\s+(\d{2,4})\s+(Yard|Yards|Meter|Meters)\s+(.+)$/i
+
+export function parseResultsEventTitle(text: string): ParsedEventTitle | null {
+  const trimmed = text.trim()
+  if (isRelayEventText(trimmed)) {
+    return {
+      distance: 0,
+      course: null,
+      eventId: null,
+      strokeLabel: '',
+      isRelay: true,
+    }
+  }
+
+  const match = trimmed.match(RESULTS_EVENT_TITLE)
+  if (!match) return null
+
+  const [, distanceStr, unit, strokeLabel] = match
+  const distance = Number(distanceStr)
+  const u = unit.toLowerCase()
+  const course: Course | null =
+    u === 'yard' || u === 'yards' ? 'SCY' : u === 'meter' || u === 'meters' ? 'SCM' : null
+  const eventId = mapHyTekEventToId(distance, strokeLabel)
+
+  return {
+    distance,
+    course,
+    eventId,
+    strokeLabel: strokeLabel.trim(),
+    isRelay: false,
+  }
+}
+
+/** Parse course from meet venue line, e.g. "- 25Y" → SCY, "- 50M" → SCM. */
+export function parseMeetCourseFromHeader(line: string): Course | null {
+  const match = line.match(/-\s*(\d+)\s*([YM])\b/i)
+  if (!match) return null
+
+  const [, lengthStr, unit] = match
+  const length = Number(lengthStr)
+  const u = unit.toUpperCase()
+
+  if (u === 'Y') return 'SCY'
+  if (u === 'M' && length <= 25) return 'SCM'
+  if (u === 'M') return 'LCM'
+
+  return null
+}
+
+/** Try Hy-Tek meet program or results-style event title parsing. */
+export function parseAnyEventTitle(text: string): ParsedEventTitle | null {
+  const direct = parseHyTekEventTitle(text) ?? parseResultsEventTitle(text)
+  if (direct) return direct
+
+  const stripped = text.replace(/^(Evento|Event)\s+\d+\s*/i, '')
+  if (stripped !== text) {
+    return parseHyTekEventTitle(stripped) ?? parseResultsEventTitle(stripped)
+  }
+
+  return null
 }

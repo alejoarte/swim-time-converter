@@ -27,6 +27,7 @@ export type BuildParsedRowInput = {
   extraIssues?: string[]
   forceStatus?: ParseRowStatus
   included?: boolean
+  sourceLineIndex?: number
 }
 
 export function buildParsedRow(input: BuildParsedRowInput): ParsedRow {
@@ -85,5 +86,6 @@ export function buildParsedRow(input: BuildParsedRowInput): ParsedRow {
     status,
     issues,
     included,
+    sourceLineIndex: input.sourceLineIndex,
   }
 }

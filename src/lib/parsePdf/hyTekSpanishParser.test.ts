@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import documentSample from '../../../document.md?raw'
+import laneFirstSample from './fixtures/hytek-es-lane-first-sample.txt?raw'
 import sampleText from './fixtures/hytek-es-sample.txt?raw'
 import fullSample from './fixtures/hytek-es-full-sample.txt?raw'
 import englishSample from './fixtures/hytek-sample.txt?raw'
@@ -50,6 +52,50 @@ describe('parseHyTekSpanishText', () => {
     const { rows } = parseHyTekSpanishText(sampleText)
     const breast = rows.find((r) => r.swimmerName.includes('Sofia Pe'))
     expect(breast?.eventId).toBe('50-breast')
+  })
+})
+
+describe('parseHyTekSpanishText lane-first layout', () => {
+  it('parses lane-first Programa de Competencias rows via layout inference', () => {
+    const { rows, meetInfo, detectedLayout, warnings } =
+      parseHyTekSpanishText(laneFirstSample)
+
+    expect(meetInfo.detectedCourse).toBe('LCM')
+    expect(meetInfo.format).toBe('hytek-es')
+    expect(detectedLayout).toBe('lane-first-time-last')
+    expect(rows.length).toBeGreaterThan(15)
+    expect(warnings.some((w) => w.includes('Lane → Name'))).toBe(true)
+
+    const tiffany = rows.find((r) => r.swimmerName.includes('Tiffany Murillo'))
+    expect(tiffany).toBeDefined()
+    expect(tiffany?.eventId).toBe('200-free')
+    expect(tiffany?.rawTime).toBe('1:59.04')
+    expect(tiffany?.lane).toBe(4)
+    expect(tiffany?.team).toBe('Antioquia')
+  })
+
+  it('parses plain lane-first rows without pipe characters', () => {
+    const { rows } = parseHyTekSpanishText(laneFirstSample)
+    const fabiola = rows.find((r) => r.swimmerName.includes('Fabiola Valentina'))
+    expect(fabiola).toBeDefined()
+    expect(fabiola?.lane).toBe(6)
+    expect(fabiola?.team).toBe('Norte de Santander')
+    expect(fabiola?.rawTime).toBe('2:24.86')
+  })
+
+  it('maps CI abbreviation to 400 IM', () => {
+    const { rows } = parseHyTekSpanishText(laneFirstSample)
+    const imRow = rows.find(
+      (r) => r.swimmerName.includes('Tiffany') && r.eventId === '400-im',
+    )
+    expect(imRow).toBeDefined()
+    expect(imRow?.rawTime).toBe('4:56.02')
+  })
+
+  it('parses full document.md lane-first meet with many rows', () => {
+    const { rows, detectedLayout } = parseHyTekSpanishText(documentSample)
+    expect(detectedLayout).toBe('lane-first-time-last')
+    expect(rows.length).toBeGreaterThan(100)
   })
 })
 
