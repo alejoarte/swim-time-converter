@@ -31,12 +31,11 @@ Open `http://localhost:5173/swim-time-converter/` (note the base path).
 |---|---|
 | `npm run dev` | Start dev server |
 | `npm run build` | Production build to `dist/` |
-| `npm test` | Run unit tests |
 | `npm run preview` | Preview production build |
 
 ## Deployment (GitHub Pages)
 
-1. Push to the `main` branch — the [deploy workflow](.github/workflows/deploy.yml) runs tests, builds, and publishes to the `gh-pages` branch.
+1. Push to the `main` branch — the [deploy workflow](.github/workflows/deploy.yml) builds and publishes to the `gh-pages` branch.
 2. In your repo **Settings → Pages**, set source to **Deploy from branch**, branch `gh-pages`, folder `/ (root)`.
 3. Visit `https://<username>.github.io/swim-time-converter/`.
 
@@ -59,5 +58,5 @@ Conversions use the Classical (Colorado Timing) factors documented by [SportsEng
 ## Tech stack
 
 - Vite + React + TypeScript
-- Vitest (unit tests)
+- i18next (English / Spanish)
 - SheetJS (`xlsx`) for Excel export

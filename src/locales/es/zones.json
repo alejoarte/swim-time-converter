@@ -1,0 +1,112 @@
+{
+  "anchor": "Media de carrera objetivo (parcial uniforme)",
+  "glossary": "A1 ≈ EN1 (base aeróbica) · A2 ≈ EN2 · A3 / VO2 ≈ EN3 / SP1 · RP ≈ SP2 (ritmo de carrera) · SP ≈ SP3. Los nombres antiguos de zonas cruise y R/V varían según el entrenador — usa el sistema de tu equipo. Los modelos de desfase fijo y porcentual se anclan a la media de carrera objetivo; trata los ritmos como ±1–3 s por 100. Los rangos de FC son estimaciones generales; confirma los objetivos con tu entrenador.",
+  "offsetModels": {
+    "fixed": {
+      "label": "Segundos fijos",
+      "description": "Los mismos +/− segundos por 100 con independencia de la velocidad (escalera tipo cruise simple)."
+    },
+    "percent": {
+      "label": "Porcentaje",
+      "description": "Escala con tu ritmo (estilo Hy-Tek); mejor para nadadores muy rápidos o lentos."
+    }
+  },
+  "systems": {
+    "a-system": {
+      "label": "Sistema A (REC, A1, A2, A3, VO2, RP, SP)",
+      "description": "Tradición de clubes UK / europeos"
+    },
+    "us-system": {
+      "label": "US Swimming (REC, EN1–EN3, SP1–SP3)",
+      "description": "Niveles de energía USA Swimming / Hy-Tek"
+    },
+    "dual": {
+      "label": "Etiquetas duales (códigos A + US)",
+      "description": "Ambos sistemas de nomenclatura lado a lado"
+    }
+  },
+  "zoneNames": {
+    "aSystem": {
+      "recovery": "Recuperación",
+      "lowAerobic": "Resistencia básica",
+      "moderateAerobic": "Tempo aeróbico",
+      "threshold": "Umbral",
+      "vo2": "Potencia aeróbica",
+      "racePace": "Ritmo de carrera",
+      "sprint": "Sprint"
+    },
+    "usSystem": {
+      "recovery": "Calentamiento / Recuperación",
+      "lowAerobic": "Base aeróbica",
+      "moderateAerobic": "Desarrollo aeróbico",
+      "threshold": "Umbral / VO2",
+      "vo2": "Mejor media",
+      "racePace": "Ritmo de carrera",
+      "sprint": "Velocidad máxima"
+    }
+  },
+  "intensity": {
+    "recovery": {
+      "purpose": "Calentamiento, vuelta a la calma, recuperación activa",
+      "restGuidance": "A elección / 15–30 s",
+      "reliabilityNote": "Los entrenadores suelen fijar ritmos de recuperación por sensación o umbral actual, no por tiempo de carrera objetivo."
+    },
+    "lowAerobic": {
+      "purpose": "Resistencia básica, base aeróbica",
+      "restGuidance": "10–20 s",
+      "reliabilityNote": "Los entrenadores suelen fijar ritmos aeróbicos según umbral/CSS actual, no por tiempo de carrera objetivo."
+    },
+    "moderateAerobic": {
+      "purpose": "Desarrollo aeróbico, técnica a tempo",
+      "restGuidance": "10–20 s",
+      "reliabilityNote": "Los entrenadores suelen fijar ritmos aeróbicos según umbral/CSS actual, no por tiempo de carrera objetivo."
+    },
+    "threshold": {
+      "purpose": "Umbral aeróbico, calidad sostenida",
+      "restGuidance": "10–30 s",
+      "reliabilityNote": "Guía útil; confirma con series de prueba o tu entrenador."
+    },
+    "vo2": {
+      "purpose": "Potencia aeróbica / series VO2 máx",
+      "restGuidance": "20 s – 1:1",
+      "reliabilityNote": "Guía útil; confirma con series de prueba o tu entrenador."
+    },
+    "racePace": {
+      "purpose": "Ensayo de ritmo de carrera, velocidad objetivo",
+      "restGuidance": "30 s – 1:2",
+      "reliabilityNote": "La mejor opción para planificar la carrera objetivo."
+    },
+    "sprint": {
+      "purpose": "Potencia / velocidad, repeticiones máximas cortas",
+      "restGuidance": "1:2 – completo",
+      "reliabilityNote": "La mejor opción para planificar la carrera objetivo."
+    }
+  },
+  "reliability": {
+    "high": "Alta",
+    "moderate": "Moderada",
+    "low": "Baja"
+  },
+  "table": {
+    "heading": "Zonas de entrenamiento",
+    "print": "Imprimir",
+    "exportExcel": "Exportar a Excel",
+    "callout1": "Ritmos de práctica para repeticiones de <strong>{{repDistance}}-{{unit}}</strong>, anclados a tu <strong>{{anchor}}</strong>. Modelo de ritmo: <strong>{{paceModel}}</strong>.",
+    "callout2": "Si tu tiempo objetivo es aspiracional, <strong>ritmo de carrera (RP/SP2)</strong> y <strong>sprint (SP/SP3)</strong> son los objetivos más fiables. Las zonas aeróbicas (REC, A1/EN1, A2/EN2) suelen fijarse según umbral o CSS actual — confirma con tu entrenador si tienes dudas.",
+    "printMeta": "<strong>{{event}}</strong> ({{course}}) · Objetivo <strong>{{time}}</strong>",
+    "printMetaSystem": "Sistema de zonas: {{system}}",
+    "caption": "Objetivos de ritmo por zona, guía de esfuerzo y etiquetas de fiabilidad.",
+    "columns": {
+      "zone": "Zona",
+      "purpose": "Propósito",
+      "effort": "Esfuerzo",
+      "hr": "FC",
+      "rpe": "RPE",
+      "rest": "Descanso",
+      "pace": "Ritmo / {{rep}}",
+      "vsRace": "vs carrera",
+      "reliability": "Fiabilidad"
+    },
+    "disclaimer": "Los ritmos de zona son estimaciones a partir de tu tiempo objetivo (modelo {{paceModel}}). Trata cada ritmo como aproximadamente ±1–3 segundos por 100. No sustituyen pruebas de lactato, referencias CSS ni el diseño de series de tu entrenador. La FC varía según edad, forma y estilo."
+  }
+}

@@ -1,4 +1,4 @@
-import type { Stroke, SwimEvent } from '../data/events'
+import { getEventLabel, type Stroke, type SwimEvent } from '../data/events'
 
 export type Course = 'SCY' | 'SCM' | 'LCM'
 
@@ -180,7 +180,7 @@ export function convertEntry(
 
   return {
     eventId: event.id,
-    eventLabel: event.label,
+    eventLabel: getEventLabel(event.id),
     sourceCourse,
     sourceCentiseconds,
     SCY: converted.SCY,

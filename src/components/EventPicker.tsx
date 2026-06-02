@@ -1,4 +1,13 @@
-import { EVENT_GROUPS, EVENTS, SUBGROUP_LABELS, type SwimEvent } from '../data/events'
+import { useTranslation } from 'react-i18next'
+import {
+  EVENT_GROUP_KEYS,
+  EVENTS,
+  getEventGroupLabel,
+  getEventLabel,
+  getSubgroupLabel,
+  type EventSubgroup,
+  type SwimEvent,
+} from '../data/events'
 
 type EventPickerProps = {
   selectedIds: Set<string>
@@ -27,7 +36,7 @@ function EventCheckboxes({
             onChange={() => onToggle(event.id)}
             disabled={disabled}
           />
-          {event.label}
+          {getEventLabel(event.id)}
         </label>
       ))}
     </div>
@@ -62,7 +71,7 @@ function renderGroupEvents(
   for (const subgroup of subgroups) {
     if (!subgroup) continue
     sections.push({
-      label: SUBGROUP_LABELS[subgroup],
+      label: getSubgroupLabel(subgroup as EventSubgroup),
       events: groupEvents.filter((e) => e.subgroup === subgroup),
     })
   }
@@ -85,6 +94,8 @@ function renderGroupEvents(
 }
 
 export function EventPicker({ selectedIds, onChange, disabled }: EventPickerProps) {
+  const { t } = useTranslation()
+
   const toggleEvent = (id: string) => {
     const next = new Set(selectedIds)
     if (next.has(id)) {
@@ -106,22 +117,22 @@ export function EventPicker({ selectedIds, onChange, disabled }: EventPickerProp
   return (
     <section className="event-picker">
       <div className="section-header">
-        <h2>Select events</h2>
+        <h2>{t('eventPicker.heading')}</h2>
         <div className="button-group">
           <button type="button" onClick={selectAll} disabled={disabled}>
-            Select all
+            {t('eventPicker.selectAll')}
           </button>
           <button type="button" onClick={clearAll} disabled={disabled}>
-            Clear all
+            {t('eventPicker.clearAll')}
           </button>
         </div>
       </div>
 
-      {EVENT_GROUPS.map((group) => {
-        const groupEvents = EVENTS.filter((e) => e.group === group.key)
+      {EVENT_GROUP_KEYS.map((groupKey) => {
+        const groupEvents = EVENTS.filter((e) => e.group === groupKey)
         return (
-          <div key={group.key} className="event-group">
-            <h3 className="event-group-title">{group.label}</h3>
+          <div key={groupKey} className="event-group">
+            <h3 className="event-group-title">{getEventGroupLabel(groupKey)}</h3>
             {renderGroupEvents(groupEvents, selectedIds, toggleEvent, disabled)}
           </div>
         )

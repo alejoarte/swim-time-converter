@@ -1,24 +1,18 @@
 import * as XLSX from 'xlsx'
 import { compareEventIds } from '../data/events'
-import { getOffsetModelLabel, ZONE_GLOSSARY } from '../data/trainingZoneSystems'
+import { getOffsetModelLabel, getZoneGlossary } from '../data/trainingZoneSystems'
+import i18n from '../i18n'
 import type { ConversionResult, Course } from './convert'
 import { formatTime } from './timeParse'
-import {
-  formatReliabilityLabel,
-  formatVsRaceOffset,
-  type TrainingZonePlan,
-} from './trainingZones'
+import { formatReliabilityLabel, formatVsRaceOffset, type TrainingZonePlan } from './trainingZones'
 
 const COURSES: Course[] = ['SCY', 'SCM', 'LCM']
-
-const EXPORT_ERROR_MESSAGE =
-  'Could not export this Excel file. Close any open copy and try again.'
 
 function writeWorkbookFile(workbook: XLSX.WorkBook, fileName: string): void {
   try {
     XLSX.writeFile(workbook, fileName)
   } catch {
-    throw new Error(EXPORT_ERROR_MESSAGE)
+    throw new Error(i18n.t('error', { ns: 'export' }))
   }
 }
 
@@ -43,39 +37,47 @@ export function exportTrainingZonesToExcel(params: TrainingZoneExportParams): vo
     showRaceAverageReference,
   } = params
 
-  const generatedAt = new Date().toLocaleString()
+  const generatedAt = new Date().toLocaleString(i18n.language)
   const repLabel = plan.practiceRepDistance === 50 ? '50' : '100'
   const unitLabel = lengthUnit === 'yard' ? 'yd' : 'm'
-
   const headerRows: (string | number)[][] = [
-    ['Swim Time Converter — Training Zones'],
-    ['Event', eventLabel],
-    ['Course', course],
-    ['Zone system', zoneSystemLabel],
-    ['Goal time', formatTime(goalCentiseconds)],
+    [i18n.t('trainingZones.title', { ns: 'export' })],
+    [i18n.t('trainingZones.event', { ns: 'export' }), eventLabel],
+    [i18n.t('trainingZones.course', { ns: 'export' }), course],
+    [i18n.t('trainingZones.zoneSystem', { ns: 'export' }), zoneSystemLabel],
+    [i18n.t('trainingZones.goalTime', { ns: 'export' }), formatTime(goalCentiseconds)],
     ...(showRaceAverageReference
       ? [
-          ['Goal race average / 100', formatTime(plan.goalPacePer100Cs)],
-          ['Goal race average / 50', formatTime(plan.goalPacePer50Cs)],
+          [
+            i18n.t('trainingZones.goalRaceAvg100', { ns: 'export' }),
+            formatTime(plan.goalPacePer100Cs),
+          ],
+          [
+            i18n.t('trainingZones.goalRaceAvg50', { ns: 'export' }),
+            formatTime(plan.goalPacePer50Cs),
+          ],
         ]
       : []),
-    [`Practice repeats`, `${plan.practiceRepDistance}-${unitLabel}`],
-    ['Pace model', getOffsetModelLabel(plan.offsetModel)],
-    ['Anchor', plan.anchorLabel],
-    ['Generated', generatedAt],
+    [
+      i18n.t('trainingZones.practiceRepeats', { ns: 'export' }),
+      `${plan.practiceRepDistance}-${unitLabel}`,
+    ],
+    [i18n.t('trainingZones.paceModel', { ns: 'export' }), getOffsetModelLabel(plan.offsetModel)],
+    [i18n.t('trainingZones.anchor', { ns: 'export' }), plan.anchorLabel],
+    [i18n.t('trainingZones.generated', { ns: 'export' }), generatedAt],
     [],
     [
-      'Zone',
-      'Name',
-      'Purpose',
-      'Effort',
-      'HR (bpm)',
-      'RPE',
-      'Rest',
-      `Pace / ${repLabel}`,
-      'vs race',
-      'Reliability',
-      'Reliability note',
+      i18n.t('trainingZones.columns.zone', { ns: 'export' }),
+      i18n.t('trainingZones.columns.name', { ns: 'export' }),
+      i18n.t('trainingZones.columns.purpose', { ns: 'export' }),
+      i18n.t('trainingZones.columns.effort', { ns: 'export' }),
+      i18n.t('trainingZones.columns.hr', { ns: 'export' }),
+      i18n.t('trainingZones.columns.rpe', { ns: 'export' }),
+      i18n.t('trainingZones.columns.rest', { ns: 'export' }),
+      i18n.t('trainingZones.columns.pace', { ns: 'export', rep: repLabel }),
+      i18n.t('trainingZones.columns.vsRace', { ns: 'export' }),
+      i18n.t('trainingZones.columns.reliability', { ns: 'export' }),
+      i18n.t('trainingZones.columns.reliabilityNote', { ns: 'export' }),
     ],
   ]
 
@@ -95,10 +97,13 @@ export function exportTrainingZonesToExcel(params: TrainingZoneExportParams): vo
 
   const footerRows: (string | number)[][] = [
     [],
-    ['Notes', ZONE_GLOSSARY],
+    [i18n.t('trainingZones.notes', { ns: 'export' }), getZoneGlossary()],
     [
-      'Disclaimer',
-      `Zone paces are estimates from your goal time (${getOffsetModelLabel(plan.offsetModel).toLowerCase()} model). Treat each pace as roughly ±1–3 seconds per 100. Not a substitute for lactate testing, CSS benchmarks, or your coach's set design.`,
+      i18n.t('trainingZones.disclaimerLabel', { ns: 'export' }),
+      i18n.t('trainingZones.disclaimer', {
+        ns: 'export',
+        paceModel: getOffsetModelLabel(plan.offsetModel).toLowerCase(),
+      }),
     ],
   ]
 
@@ -118,7 +123,7 @@ export function exportTrainingZonesToExcel(params: TrainingZoneExportParams): vo
   ]
 
   const workbook = XLSX.utils.book_new()
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Training Zones')
+  XLSX.utils.book_append_sheet(workbook, worksheet, i18n.t('trainingZones.sheetName', { ns: 'export' }))
 
   const dateStamp = new Date().toISOString().slice(0, 10)
   const slug = eventLabel
@@ -129,17 +134,21 @@ export function exportTrainingZonesToExcel(params: TrainingZoneExportParams): vo
 }
 
 export function exportToExcel(results: ConversionResult[], sourceCourse: Course): void {
-  const generatedAt = new Date().toLocaleString()
-
+  const generatedAt = new Date().toLocaleString(i18n.language)
   const headerRows: (string | number)[][] = [
-    ['Swim Time Converter'],
-    ['Source course', sourceCourse],
-    ['Generated', generatedAt],
-    [
-      'Conversions use Classical (Colorado Timing) factors. Converted times are estimates and not official.',
-    ],
+    [i18n.t('conversions.title', { ns: 'export' })],
+    [i18n.t('conversions.sourceCourse', { ns: 'export' }), sourceCourse],
+    [i18n.t('conversions.generated', { ns: 'export' }), generatedAt],
+    [i18n.t('conversions.disclaimer', { ns: 'export' })],
     [],
-    ['Event', 'Source Course', 'Source Time', 'SCY', 'SCM', 'LCM'],
+    [
+      i18n.t('conversions.columns.event', { ns: 'export' }),
+      i18n.t('conversions.columns.sourceCourse', { ns: 'export' }),
+      i18n.t('conversions.columns.sourceTime', { ns: 'export' }),
+      'SCY',
+      'SCM',
+      'LCM',
+    ],
   ]
 
   const sortedResults = [...results].sort((a, b) => compareEventIds(a.eventId, b.eventId))
@@ -164,7 +173,7 @@ export function exportToExcel(results: ConversionResult[], sourceCourse: Course)
   ]
 
   const workbook = XLSX.utils.book_new()
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Conversions')
+  XLSX.utils.book_append_sheet(workbook, worksheet, i18n.t('conversions.sheetName', { ns: 'export' }))
 
   const dateStamp = new Date().toISOString().slice(0, 10)
   writeWorkbookFile(workbook, `swim-conversions-${dateStamp}.xlsx`)

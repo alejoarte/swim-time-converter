@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import { getEventLabel } from '../data/events'
 import type { ConversionResult, Course } from '../lib/convert'
 import { formatTime } from '../lib/timeParse'
 
@@ -10,30 +12,30 @@ type ResultsTableProps = {
 const COURSES: Course[] = ['SCY', 'SCM', 'LCM']
 
 export function ResultsTable({ results, onEditTimes, onExport }: ResultsTableProps) {
+  const { t } = useTranslation()
+
   if (results.length === 0) return null
 
   return (
     <section className="results">
       <div className="section-header">
-        <h2>Results</h2>
+        <h2>{t('results.heading')}</h2>
         <div className="button-group">
           <button type="button" className="secondary" onClick={onEditTimes}>
-            Edit times
+            {t('results.editTimes')}
           </button>
           <button type="button" onClick={onExport}>
-            Export to Excel
+            {t('results.exportExcel')}
           </button>
         </div>
       </div>
 
       <div className="table-wrapper">
         <table>
-          <caption className="visually-hidden">
-            Converted event times across SCY, SCM, and LCM.
-          </caption>
+          <caption className="visually-hidden">{t('results.caption')}</caption>
           <thead>
             <tr>
-              <th>Event</th>
+              <th>{t('results.eventColumn')}</th>
               {COURSES.map((course) => (
                 <th key={course}>{course}</th>
               ))}
@@ -42,7 +44,7 @@ export function ResultsTable({ results, onEditTimes, onExport }: ResultsTablePro
           <tbody>
             {results.map((row) => (
               <tr key={row.eventId}>
-                <td>{row.eventLabel}</td>
+                <td>{getEventLabel(row.eventId)}</td>
                 {COURSES.map((course) => (
                   <td
                     key={course}
@@ -50,7 +52,7 @@ export function ResultsTable({ results, onEditTimes, onExport }: ResultsTablePro
                   >
                     {formatTime(row[course])}
                     {course === row.sourceCourse && (
-                      <span className="source-marker" title="Source time">
+                      <span className="source-marker" title={t('results.sourceMarkerTitle')}>
                         *
                       </span>
                     )}
@@ -61,7 +63,7 @@ export function ResultsTable({ results, onEditTimes, onExport }: ResultsTablePro
           </tbody>
         </table>
       </div>
-      <p className="hint">* = your entered time</p>
+      <p className="hint">{t('results.sourceHint')}</p>
     </section>
   )
 }

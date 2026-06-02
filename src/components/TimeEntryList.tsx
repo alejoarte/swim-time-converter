@@ -1,4 +1,5 @@
-import { compareEventIds, getEventById } from '../data/events'
+import { useTranslation } from 'react-i18next'
+import { compareEventIds, getEventById, getEventLabel } from '../data/events'
 import type { Course } from '../lib/convert'
 import {
   EMPTY_TIME_PARTS,
@@ -27,11 +28,13 @@ export function TimeEntryList({
   showErrors,
   disabled,
 }: TimeEntryListProps) {
+  const { t } = useTranslation()
+
   if (selectedIds.length === 0) {
     return (
       <section className="time-entry">
-        <h2>Enter {sourceCourse} times</h2>
-        <p className="hint">Select at least one event above to enter times.</p>
+        <h2>{t('timeEntry.heading', { course: sourceCourse })}</h2>
+        <p className="hint">{t('timeEntry.emptyHint')}</p>
       </section>
     )
   }
@@ -40,7 +43,7 @@ export function TimeEntryList({
 
   return (
     <section className="time-entry">
-      <h2>Enter {sourceCourse} times</h2>
+      <h2>{t('timeEntry.heading', { course: sourceCourse })}</h2>
       <ul className="time-entry-list">
         {sortedIds.map((id) => {
           const event = getEventById(id)
@@ -49,7 +52,7 @@ export function TimeEntryList({
 
           return (
             <li key={id} className="time-entry-row">
-              <span className="time-entry-event-label">{event.label}</span>
+              <span className="time-entry-event-label">{getEventLabel(id)}</span>
               <TimeFields
                 idPrefix={`time-${id}`}
                 value={value}

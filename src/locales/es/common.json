@@ -1,0 +1,87 @@
+{
+  "app": {
+    "title": "Conversor de tiempos de natación",
+    "tagline": "Convierte tiempos entre SCY, SCM y LCM y planifica zonas de entrenamiento.",
+    "metaDescription": "Convierte tiempos entre SCY, SCM y LCM y planifica zonas de entrenamiento."
+  },
+  "language": {
+    "label": "Idioma",
+    "en": "English",
+    "es": "Español"
+  },
+  "skipToMain": "Saltar al contenido principal",
+  "mode": {
+    "label": "Modo de entrada",
+    "manual": "Entrada manual",
+    "plan": "Planificar entrenamiento"
+  },
+  "announcements": {
+    "results": "Se generaron {{count}} filas de conversión.",
+    "planMode": "Modo planificar entrenamiento.",
+    "manualMode": "Modo entrada manual."
+  },
+  "generate": {
+    "button": "Generar conversiones",
+    "hint": "Introduce un tiempo válido para cada prueba seleccionada."
+  },
+  "loadingPlan": "Cargando plan de entrenamiento…",
+  "disclaimer": "Las conversiones usan factores clásicos (Colorado Timing). Los ritmos de zona son estimaciones según tus datos. Nada de esto es oficial ni sustituye la orientación de tu entrenador.",
+  "exportError": "No se pudieron exportar los resultados.",
+  "course": {
+    "headingDefault": "Mis tiempos están en",
+    "headingPlan": "Piscina",
+    "scyDesc": "Piscina corta en yardas",
+    "scmDesc": "Piscina corta en metros",
+    "lcmDesc": "Piscina larga en metros"
+  },
+  "eventPicker": {
+    "heading": "Seleccionar pruebas",
+    "selectAll": "Seleccionar todo",
+    "clearAll": "Borrar todo"
+  },
+  "eventSelect": {
+    "heading": "Seleccionar prueba",
+    "ariaLabel": "Seleccionar prueba"
+  },
+  "timeEntry": {
+    "heading": "Introducir tiempos {{course}}",
+    "emptyHint": "Selecciona al menos una prueba arriba para introducir tiempos."
+  },
+  "timeFields": {
+    "ariaLabel": "Tiempo de nado",
+    "min": "Min",
+    "sec": "Seg",
+    "hund": "Cent",
+    "errors": {
+      "empty": "Introduce al menos un valor",
+      "seconds_range": "Los segundos deben ser 00–59",
+      "hundredths_range": "Las centésimas deben ser 00–99",
+      "minutes_invalid": "Los minutos deben ser un número"
+    }
+  },
+  "results": {
+    "heading": "Resultados",
+    "editTimes": "Editar tiempos",
+    "exportExcel": "Exportar a Excel",
+    "caption": "Tiempos convertidos en SCY, SCM y LCM.",
+    "eventColumn": "Prueba",
+    "sourceMarkerTitle": "Tiempo introducido",
+    "sourceHint": "* = tu tiempo introducido"
+  },
+  "plan": {
+    "goalTime": "Tiempo objetivo",
+    "zoneNaming": "Nomenclatura de zonas",
+    "zoneNamingHint": "Usa el sistema que utilice tu club o entrenador.",
+    "zoneSystemAria": "Sistema de nomenclatura de zonas",
+    "paceModel": "Modelo de ritmo",
+    "paceModelLegend": "Modelo de desfase de ritmo",
+    "summaryGoal": "<strong>{{event}}</strong> ({{course}}) · Objetivo <strong>{{time}}</strong>",
+    "summaryReference": "Media de carrera objetivo (referencia): <strong>{{pace100}}</strong> / 100 · <strong>{{pace50}}</strong> / 50 ({{unit}})",
+    "exportError": "No se pudieron exportar las zonas de entrenamiento."
+  },
+  "errorBoundary": {
+    "title": "Algo salió mal",
+    "hint": "La aplicación encontró un error inesperado. Recarga e inténtalo de nuevo.",
+    "reload": "Recargar aplicación"
+  }
+}

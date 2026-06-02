@@ -1,0 +1,45 @@
+{
+  "error": "Could not export this Excel file. Close any open copy and try again.",
+  "conversions": {
+    "title": "Swim Time Converter",
+    "sourceCourse": "Source course",
+    "generated": "Generated",
+    "disclaimer": "Conversions use Classical (Colorado Timing) factors. Converted times are estimates and not official.",
+    "sheetName": "Conversions",
+    "columns": {
+      "event": "Event",
+      "sourceCourse": "Source Course",
+      "sourceTime": "Source Time"
+    }
+  },
+  "trainingZones": {
+    "title": "Swim Time Converter — Training Zones",
+    "event": "Event",
+    "course": "Course",
+    "zoneSystem": "Zone system",
+    "goalTime": "Goal time",
+    "goalRaceAvg100": "Goal race average / 100",
+    "goalRaceAvg50": "Goal race average / 50",
+    "practiceRepeats": "Practice repeats",
+    "paceModel": "Pace model",
+    "anchor": "Anchor",
+    "generated": "Generated",
+    "sheetName": "Training Zones",
+    "columns": {
+      "zone": "Zone",
+      "name": "Name",
+      "purpose": "Purpose",
+      "effort": "Effort",
+      "hr": "HR (bpm)",
+      "rpe": "RPE",
+      "rest": "Rest",
+      "pace": "Pace / {{rep}}",
+      "vsRace": "vs race",
+      "reliability": "Reliability",
+      "reliabilityNote": "Reliability note"
+    },
+    "notes": "Notes",
+    "disclaimerLabel": "Disclaimer",
+    "disclaimer": "Zone paces are estimates from your goal time ({{paceModel}} model). Treat each pace as roughly ±1–3 seconds per 100. Not a substitute for lactate testing, CSS benchmarks, or your coach's set design."
+  }
+}

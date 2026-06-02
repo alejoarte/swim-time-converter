@@ -1,0 +1,32 @@
+{
+  "groups": {
+    "fly": "Mariposa",
+    "back": "Espalda",
+    "breast": "Pecho",
+    "free": "Libre",
+    "im": "Estilos individuales"
+  },
+  "subgroups": {
+    "distance-free": "Libre de fondo"
+  },
+  "items": {
+    "50-fly": "50 Mariposa",
+    "100-fly": "100 Mariposa",
+    "200-fly": "200 Mariposa",
+    "50-back": "50 Espalda",
+    "100-back": "100 Espalda",
+    "200-back": "200 Espalda",
+    "50-breast": "50 Pecho",
+    "100-breast": "100 Pecho",
+    "200-breast": "200 Pecho",
+    "50-free": "50 Libre",
+    "100-free": "100 Libre",
+    "200-free": "200 Libre",
+    "400-500-free": "400/500 Libre",
+    "800-1000-free": "800/1000 Libre",
+    "1500-1650-free": "1500/1650 Libre",
+    "100-im": "100 EI",
+    "200-im": "200 EI",
+    "400-im": "400 EI"
+  }
+}

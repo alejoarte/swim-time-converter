@@ -1,4 +1,12 @@
-import { EVENT_GROUPS, EVENTS, SUBGROUP_LABELS } from '../data/events'
+import { useTranslation } from 'react-i18next'
+import {
+  EVENT_GROUP_KEYS,
+  EVENTS,
+  getEventGroupLabel,
+  getEventLabel,
+  getSubgroupLabel,
+  type EventSubgroup,
+} from '../data/events'
 
 type EventSelectProps = {
   value: string
@@ -7,26 +15,29 @@ type EventSelectProps = {
 }
 
 export function EventSelect({ value, onChange, disabled }: EventSelectProps) {
+  const { t } = useTranslation()
+
   return (
     <section className="event-select-section">
-      <h2>Select event</h2>
+      <h2>{t('eventSelect.heading')}</h2>
       <select
         className="event-select"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         disabled={disabled}
-        aria-label="Select event"
+        aria-label={t('eventSelect.ariaLabel')}
       >
-        {EVENT_GROUPS.map((group) => {
-          const groupEvents = EVENTS.filter((e) => e.group === group.key)
+        {EVENT_GROUP_KEYS.map((groupKey) => {
+          const groupEvents = EVENTS.filter((e) => e.group === groupKey)
           const subgroups = [...new Set(groupEvents.map((e) => e.subgroup))]
+          const groupLabel = getEventGroupLabel(groupKey)
 
           if (subgroups.length <= 1 && !subgroups[0]) {
             return (
-              <optgroup key={group.key} label={group.label}>
+              <optgroup key={groupKey} label={groupLabel}>
                 {groupEvents.map((event) => (
                   <option key={event.id} value={event.id}>
-                    {event.label}
+                    {getEventLabel(event.id)}
                   </option>
                 ))}
               </optgroup>
@@ -36,13 +47,13 @@ export function EventSelect({ value, onChange, disabled }: EventSelectProps) {
           const sections: { label: string; events: typeof groupEvents }[] = []
           const mainEvents = groupEvents.filter((e) => !e.subgroup)
           if (mainEvents.length > 0) {
-            sections.push({ label: group.label, events: mainEvents })
+            sections.push({ label: groupLabel, events: mainEvents })
           }
 
           for (const subgroup of subgroups) {
             if (!subgroup) continue
             sections.push({
-              label: `${group.label} — ${SUBGROUP_LABELS[subgroup]}`,
+              label: `${groupLabel} — ${getSubgroupLabel(subgroup as EventSubgroup)}`,
               events: groupEvents.filter((e) => e.subgroup === subgroup),
             })
           }
@@ -51,7 +62,7 @@ export function EventSelect({ value, onChange, disabled }: EventSelectProps) {
             <optgroup key={section.label} label={section.label}>
               {section.events.map((event) => (
                 <option key={event.id} value={event.id}>
-                  {event.label}
+                  {getEventLabel(event.id)}
                 </option>
               ))}
             </optgroup>

@@ -1,6 +1,8 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { CourseSelector } from './components/CourseSelector'
 import { EventPicker } from './components/EventPicker'
+import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { ResultsTable } from './components/ResultsTable'
 import { canGenerate, TimeEntryList } from './components/TimeEntryList'
 import { compareEventIds, getEventById } from './data/events'
@@ -70,6 +72,7 @@ const PlanTraining = lazy(() =>
 )
 
 function App() {
+  const { t } = useTranslation()
   const [savedManualState] = useState<SavedManualState | null>(() =>
     loadSavedManualState(),
   )
@@ -105,10 +108,10 @@ function App() {
   const selectedList = [...selectedIds]
   const ready = canGenerate(selectedList, times)
   const announcement = results
-    ? `Generated ${results.length} conversion result rows.`
+    ? t('announcements.results', { count: results.length })
     : mode === 'plan'
-      ? 'Plan training mode.'
-      : 'Manual entry mode.'
+      ? t('announcements.planMode')
+      : t('announcements.manualMode')
 
   const handleTimeChange = (eventId: string, part: TimePart, value: string) => {
     setTimes((prev) => ({
@@ -184,27 +187,29 @@ function App() {
     try {
       exportToExcel(results, sourceCourse)
     } catch (error) {
-      setExportError(error instanceof Error ? error.message : 'Failed to export results.')
+      setExportError(
+        error instanceof Error ? error.message : t('exportError'),
+      )
     }
   }
 
   return (
     <div className="app">
       <a href="#main-content" className="skip-link">
-        Skip to main content
+        {t('skipToMain')}
       </a>
       <p className="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
         {announcement}
       </p>
       <header className="app-chrome">
         <div className="app-branding">
-          <h1>Swim Time Converter</h1>
-          <p className="app-tagline">
-            Convert times between SCY, SCM, and LCM, and plan training zones.
-          </p>
+          <h1>{t('app.title')}</h1>
+          <p className="app-tagline">{t('app.tagline')}</p>
         </div>
 
-        <nav className="mode-switch" aria-label="Entry mode">
+        <LanguageSwitcher />
+
+        <nav className="mode-switch" aria-label={t('mode.label')}>
           <button
             type="button"
             className={
@@ -215,7 +220,7 @@ function App() {
             onClick={() => setMode('manual')}
             aria-current={mode === 'manual' ? 'page' : undefined}
           >
-            Manual entry
+            {t('mode.manual')}
           </button>
           <button
             type="button"
@@ -227,7 +232,7 @@ function App() {
             onClick={() => setMode('plan')}
             aria-current={mode === 'plan' ? 'page' : undefined}
           >
-            Plan training
+            {t('mode.plan')}
           </button>
         </nav>
       </header>
@@ -237,7 +242,7 @@ function App() {
           <Suspense
             fallback={
               <p className="hint" role="status">
-                Loading plan training…
+                {t('loadingPlan')}
               </p>
             }
           >
@@ -274,10 +279,10 @@ function App() {
                 onClick={handleGenerate}
                 disabled={locked || !ready}
               >
-                Generate conversions
+                {t('generate.button')}
               </button>
               {!ready && selectedList.length > 0 && !locked && (
-                <p className="hint">Enter a valid time for each selected event.</p>
+                <p className="hint">{t('generate.hint')}</p>
               )}
             </div>
 
@@ -300,11 +305,7 @@ function App() {
       </main>
 
       <footer className="app-disclaimer">
-        <p>
-          Converted times use Classical (Colorado Timing) factors. Training zone paces are
-          estimated from your inputs. Nothing here is official or a substitute for your
-          coach&apos;s guidance.
-        </p>
+        <p>{t('disclaimer')}</p>
       </footer>
     </div>
   )

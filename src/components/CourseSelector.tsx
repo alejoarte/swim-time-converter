@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { Course } from '../lib/convert'
 
 type CourseSelectorProps = {
@@ -8,23 +9,26 @@ type CourseSelectorProps = {
   name?: string
 }
 
-const COURSES: { value: Course; label: string; description: string }[] = [
-  { value: 'SCY', label: 'SCY', description: 'Short Course Yards' },
-  { value: 'SCM', label: 'SCM', description: 'Short Course Meters' },
-  { value: 'LCM', label: 'LCM', description: 'Long Course Meters' },
+const COURSES: { value: Course; descKey: 'scyDesc' | 'scmDesc' | 'lcmDesc' }[] = [
+  { value: 'SCY', descKey: 'scyDesc' },
+  { value: 'SCM', descKey: 'scmDesc' },
+  { value: 'LCM', descKey: 'lcmDesc' },
 ]
 
 export function CourseSelector({
   value,
   onChange,
   disabled,
-  heading = 'My times are in',
+  heading,
   name = 'source-course',
 }: CourseSelectorProps) {
+  const { t } = useTranslation()
+  const headingText = heading ?? t('course.headingDefault')
+
   return (
     <section className="course-selector">
-      <h2>{heading}</h2>
-      <div className="course-options" role="radiogroup" aria-label={heading}>
+      <h2>{headingText}</h2>
+      <div className="course-options" role="radiogroup" aria-label={headingText}>
         {COURSES.map((course) => (
           <label key={course.value} className="course-option">
             <input
@@ -35,8 +39,8 @@ export function CourseSelector({
               onChange={() => onChange(course.value)}
               disabled={disabled}
             />
-            <span className="course-label">{course.label}</span>
-            <span className="course-desc">{course.description}</span>
+            <span className="course-label">{course.value}</span>
+            <span className="course-desc">{t(`course.${course.descKey}`)}</span>
           </label>
         ))}
       </div>

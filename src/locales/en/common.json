@@ -1,0 +1,87 @@
+{
+  "app": {
+    "title": "Swim Time Converter",
+    "tagline": "Convert times between SCY, SCM, and LCM, and plan training zones.",
+    "metaDescription": "Convert times between SCY, SCM, and LCM, and plan training zones."
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "es": "Español"
+  },
+  "skipToMain": "Skip to main content",
+  "mode": {
+    "label": "Entry mode",
+    "manual": "Manual entry",
+    "plan": "Plan training"
+  },
+  "announcements": {
+    "results": "Generated {{count}} conversion result rows.",
+    "planMode": "Plan training mode.",
+    "manualMode": "Manual entry mode."
+  },
+  "generate": {
+    "button": "Generate conversions",
+    "hint": "Enter a valid time for each selected event."
+  },
+  "loadingPlan": "Loading plan training…",
+  "disclaimer": "Converted times use Classical (Colorado Timing) factors. Training zone paces are estimated from your inputs. Nothing here is official or a substitute for your coach's guidance.",
+  "exportError": "Failed to export results.",
+  "course": {
+    "headingDefault": "My times are in",
+    "headingPlan": "Pool course",
+    "scyDesc": "Short Course Yards",
+    "scmDesc": "Short Course Meters",
+    "lcmDesc": "Long Course Meters"
+  },
+  "eventPicker": {
+    "heading": "Select events",
+    "selectAll": "Select all",
+    "clearAll": "Clear all"
+  },
+  "eventSelect": {
+    "heading": "Select event",
+    "ariaLabel": "Select event"
+  },
+  "timeEntry": {
+    "heading": "Enter {{course}} times",
+    "emptyHint": "Select at least one event above to enter times."
+  },
+  "timeFields": {
+    "ariaLabel": "Swim time",
+    "min": "Min",
+    "sec": "Sec",
+    "hund": "Hund",
+    "errors": {
+      "empty": "Enter at least one value",
+      "seconds_range": "Seconds must be 00–59",
+      "hundredths_range": "Hundredths must be 00–99",
+      "minutes_invalid": "Minutes must be a number"
+    }
+  },
+  "results": {
+    "heading": "Results",
+    "editTimes": "Edit times",
+    "exportExcel": "Export to Excel",
+    "caption": "Converted event times across SCY, SCM, and LCM.",
+    "eventColumn": "Event",
+    "sourceMarkerTitle": "Source time",
+    "sourceHint": "* = your entered time"
+  },
+  "plan": {
+    "goalTime": "Goal time",
+    "zoneNaming": "Zone naming",
+    "zoneNamingHint": "Match the system your coach or club uses.",
+    "zoneSystemAria": "Training zone naming system",
+    "paceModel": "Pace model",
+    "paceModelLegend": "Pace offset model",
+    "summaryGoal": "<strong>{{event}}</strong> ({{course}}) · Goal <strong>{{time}}</strong>",
+    "summaryReference": "Goal race average (reference): <strong>{{pace100}}</strong> / 100 · <strong>{{pace50}}</strong> / 50 ({{unit}}s)",
+    "exportError": "Failed to export training zones."
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "hint": "The app hit an unexpected error. Reload and try again.",
+    "reload": "Reload app"
+  }
+}

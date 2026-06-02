@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import i18n from '../i18n'
 
 type AppErrorBoundaryProps = {
   children: ReactNode
@@ -21,7 +22,6 @@ export class AppErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    // The fallback UI is enough for this client-only app.
     void error
     void errorInfo
   }
@@ -34,10 +34,10 @@ export class AppErrorBoundary extends Component<
     if (this.state.hasError) {
       return (
         <main className="app app-error-state" role="alert" aria-live="assertive">
-          <h1>Something went wrong</h1>
-          <p className="hint">The app hit an unexpected error. Reload and try again.</p>
+          <h1>{i18n.t('errorBoundary.title', { ns: 'common' })}</h1>
+          <p className="hint">{i18n.t('errorBoundary.hint', { ns: 'common' })}</p>
           <button type="button" onClick={this.handleReload}>
-            Reload app
+            {i18n.t('errorBoundary.reload', { ns: 'common' })}
           </button>
         </main>
       )

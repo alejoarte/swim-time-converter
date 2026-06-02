@@ -1,11 +1,14 @@
-import { useState } from 'react'
-import { getEventById } from '../data/events'
+import { useMemo, useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import { getEventById, getEventLabel } from '../data/events'
 import {
-  getZoneSystem,
-  OFFSET_MODELS,
+  getOffsetModelDescription,
+  getOffsetModelLabel,
+  getZoneSystemLabel,
+  OFFSET_MODEL_IDS,
+  ZONE_SYSTEMS,
   type OffsetModel,
   type ZoneSystemId,
-  ZONE_SYSTEMS,
 } from '../data/trainingZoneSystems'
 import { type Course } from '../lib/convert'
 import { exportTrainingZonesToExcel } from '../lib/exportExcel'
@@ -28,6 +31,7 @@ import { TimeFields } from './TimeFields'
 import { TrainingZonesTable } from './TrainingZonesTable'
 
 export function PlanTraining() {
+  const { t, i18n } = useTranslation()
   const [course, setCourse] = useState<Course>('SCY')
   const [eventId, setEventId] = useState('200-free')
   const [zoneSystemId, setZoneSystemId] = useState<ZoneSystemId>('a-system')
@@ -41,10 +45,10 @@ export function PlanTraining() {
   const validGoal = goalCs !== null && isValidTimeParts(goalTime)
   const lengthUnit = getLengthUnitLabel(course)
 
-  const zonePlan =
-    event && validGoal && goalCs !== null
-      ? computeTrainingZoneRows(goalCs, event, course, zoneSystemId, offsetModel)
-      : null
+  const zonePlan = useMemo(() => {
+    if (!event || !validGoal || goalCs === null) return null
+    return computeTrainingZoneRows(goalCs, event, course, zoneSystemId, offsetModel)
+  }, [event, validGoal, goalCs, course, zoneSystemId, offsetModel, i18n.language])
 
   const handleGoalBlur = () => {
     if (!isValidTimeParts(goalTime) && !isTimePartsEmpty(goalTime)) {
@@ -52,19 +56,22 @@ export function PlanTraining() {
     }
   }
 
+  const eventLabel = event ? getEventLabel(event.id) : ''
+  const zoneSystemLabel = getZoneSystemLabel(zoneSystemId)
+
   return (
     <div className="plan-training">
       <CourseSelector
         value={course}
         onChange={setCourse}
-        heading="Pool course"
+        heading={t('course.headingPlan')}
         name="plan-course"
       />
 
       <EventSelect value={eventId} onChange={setEventId} />
 
       <section className="goal-time-section">
-        <h2>Goal time</h2>
+        <h2>{t('plan.goalTime')}</h2>
         <div onBlur={handleGoalBlur}>
           <TimeFields
             idPrefix="goal"
@@ -81,19 +88,19 @@ export function PlanTraining() {
 
       {validGoal && (
         <section className="zone-system-section">
-          <h2>Zone naming</h2>
+          <h2>{t('plan.zoneNaming')}</h2>
           <p className="hint plan-time-hint plan-time-hint--above">
-            Match the system your coach or club uses.
+            {t('plan.zoneNamingHint')}
           </p>
           <select
             className="zone-system-select"
             value={zoneSystemId}
             onChange={(e) => setZoneSystemId(e.target.value as ZoneSystemId)}
-            aria-label="Training zone naming system"
+            aria-label={t('plan.zoneSystemAria')}
           >
             {ZONE_SYSTEMS.map((system) => (
               <option key={system.id} value={system.id}>
-                {system.label}
+                {getZoneSystemLabel(system.id)}
               </option>
             ))}
           </select>
@@ -102,21 +109,23 @@ export function PlanTraining() {
 
       {validGoal && (
         <section className="pace-model-section">
-          <h2>Pace model</h2>
+          <h2>{t('plan.paceModel')}</h2>
           <fieldset className="pace-model-fieldset">
-            <legend className="visually-hidden">Pace offset model</legend>
-            {OFFSET_MODELS.map((model) => (
-              <label key={model.id} className="pace-model-option">
+            <legend className="visually-hidden">{t('plan.paceModelLegend')}</legend>
+            {OFFSET_MODEL_IDS.map((modelId) => (
+              <label key={modelId} className="pace-model-option">
                 <input
                   type="radio"
                   name="pace-model"
-                  value={model.id}
-                  checked={offsetModel === model.id}
-                  onChange={() => setOffsetModel(model.id)}
+                  value={modelId}
+                  checked={offsetModel === modelId}
+                  onChange={() => setOffsetModel(modelId)}
                 />
                 <span className="pace-model-option-label">
-                  <strong>{model.label}</strong>
-                  <span className="pace-model-option-desc">{model.description}</span>
+                  <strong>{getOffsetModelLabel(modelId)}</strong>
+                  <span className="pace-model-option-desc">
+                    {getOffsetModelDescription(modelId)}
+                  </span>
                 </span>
               </label>
             ))}
@@ -128,15 +137,27 @@ export function PlanTraining() {
         <div className="plan-results plan-print-area" aria-live="polite">
           <section className="plan-summary no-print-duplicate">
             <p>
-              <strong>{event.label}</strong> ({course}) · Goal{' '}
-              <strong>{formatTime(goalCs)}</strong>
+              <Trans
+                i18nKey="plan.summaryGoal"
+                values={{
+                  event: eventLabel,
+                  course,
+                  time: formatTime(goalCs),
+                }}
+                components={{ strong: <strong /> }}
+              />
             </p>
             {shouldShowRaceAverageReference(event) && (
               <p className="plan-summary-reference">
-                Goal race average (reference):{' '}
-                <strong>{formatTime(zonePlan.goalPacePer100Cs)}</strong> / 100 ·{' '}
-                <strong>{formatTime(zonePlan.goalPacePer50Cs)}</strong> / 50 ({lengthUnit}
-                s)
+                <Trans
+                  i18nKey="plan.summaryReference"
+                  values={{
+                    pace100: formatTime(zonePlan.goalPacePer100Cs),
+                    pace50: formatTime(zonePlan.goalPacePer50Cs),
+                    unit: lengthUnit,
+                  }}
+                  components={{ strong: <strong /> }}
+                />
               </p>
             )}
           </section>
@@ -145,9 +166,9 @@ export function PlanTraining() {
             plan={zonePlan}
             lengthUnit={lengthUnit}
             context={{
-              eventLabel: event.label,
+              eventLabel,
               course,
-              zoneSystemLabel: getZoneSystem(zoneSystemId).label,
+              zoneSystemLabel,
               goalCentiseconds: goalCs,
             }}
             onExport={() =>
@@ -155,9 +176,9 @@ export function PlanTraining() {
                 setExportError(null)
                 try {
                   exportTrainingZonesToExcel({
-                    eventLabel: event.label,
+                    eventLabel,
                     course,
-                    zoneSystemLabel: getZoneSystem(zoneSystemId).label,
+                    zoneSystemLabel,
                     goalCentiseconds: goalCs,
                     lengthUnit,
                     plan: zonePlan,
@@ -165,9 +186,7 @@ export function PlanTraining() {
                   })
                 } catch (error) {
                   setExportError(
-                    error instanceof Error
-                      ? error.message
-                      : 'Failed to export training zones.',
+                    error instanceof Error ? error.message : t('plan.exportError'),
                   )
                 }
               })()

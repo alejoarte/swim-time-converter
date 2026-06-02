@@ -1,0 +1,32 @@
+{
+  "groups": {
+    "fly": "Butterfly",
+    "back": "Backstroke",
+    "breast": "Breaststroke",
+    "free": "Freestyle",
+    "im": "Individual Medley"
+  },
+  "subgroups": {
+    "distance-free": "Distance Freestyle"
+  },
+  "items": {
+    "50-fly": "50 Fly",
+    "100-fly": "100 Fly",
+    "200-fly": "200 Fly",
+    "50-back": "50 Back",
+    "100-back": "100 Back",
+    "200-back": "200 Back",
+    "50-breast": "50 Breast",
+    "100-breast": "100 Breast",
+    "200-breast": "200 Breast",
+    "50-free": "50 Free",
+    "100-free": "100 Free",
+    "200-free": "200 Free",
+    "400-500-free": "400/500 Free",
+    "800-1000-free": "800/1000 Free",
+    "1500-1650-free": "1500/1650 Free",
+    "100-im": "100 IM",
+    "200-im": "200 IM",
+    "400-im": "400 IM"
+  }
+}

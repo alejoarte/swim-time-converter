@@ -1,17 +1,11 @@
 import { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   getTimePartsError,
   normalizeTimeParts,
   type TimePart,
   type TimeParts,
 } from '../lib/timeParse'
-
-const ERROR_MESSAGES: Record<NonNullable<ReturnType<typeof getTimePartsError>>, string> = {
-  empty: 'Enter at least one value',
-  seconds_range: 'Seconds must be 00–59',
-  hundredths_range: 'Hundredths must be 00–99',
-  minutes_invalid: 'Minutes must be a number',
-}
 
 type TimeFieldsProps = {
   idPrefix: string
@@ -34,13 +28,14 @@ export function TimeFields({
   disabled,
   showErrors,
 }: TimeFieldsProps) {
+  const { t } = useTranslation()
   const groupRef = useRef<HTMLDivElement>(null)
   const hundredthsRef = useRef<HTMLInputElement>(null)
   const latestPartsRef = useRef(value)
   latestPartsRef.current = value
 
   const error = showErrors ? getTimePartsError(value) : null
-  const errorMessage = error ? ERROR_MESSAGES[error] : null
+  const errorMessage = error ? t(`timeFields.errors.${error}`) : null
 
   const handleChange = (part: TimePart, raw: string, maxLength: number) => {
     const next = digitsOnly(raw, maxLength)
@@ -80,12 +75,12 @@ export function TimeFields({
         ref={groupRef}
         className="time-fields"
         role="group"
-        aria-label="Swim time"
+        aria-label={t('timeFields.ariaLabel')}
         aria-invalid={!!error}
       >
         <div className="time-field">
           <label className="time-field-label" htmlFor={`${idPrefix}-min`}>
-            Min
+            {t('timeFields.min')}
           </label>
           <input
             id={`${idPrefix}-min`}
@@ -107,7 +102,7 @@ export function TimeFields({
         </span>
         <div className="time-field">
           <label className="time-field-label" htmlFor={`${idPrefix}-sec`}>
-            Sec
+            {t('timeFields.sec')}
           </label>
           <input
             id={`${idPrefix}-sec`}
@@ -129,7 +124,7 @@ export function TimeFields({
         </span>
         <div className="time-field">
           <label className="time-field-label" htmlFor={`${idPrefix}-hund`}>
-            Hund
+            {t('timeFields.hund')}
           </label>
           <input
             ref={hundredthsRef}

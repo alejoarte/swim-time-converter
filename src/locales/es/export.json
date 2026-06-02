@@ -1,0 +1,45 @@
+{
+  "error": "No se pudo exportar este archivo Excel. Cierra cualquier copia abierta e inténtalo de nuevo.",
+  "conversions": {
+    "title": "Conversor de tiempos de natación",
+    "sourceCourse": "Piscina de origen",
+    "generated": "Generado",
+    "disclaimer": "Las conversiones usan factores clásicos (Colorado Timing). Los tiempos convertidos son estimaciones y no son oficiales.",
+    "sheetName": "Conversiones",
+    "columns": {
+      "event": "Prueba",
+      "sourceCourse": "Piscina origen",
+      "sourceTime": "Tiempo origen"
+    }
+  },
+  "trainingZones": {
+    "title": "Conversor de tiempos — Zonas de entrenamiento",
+    "event": "Prueba",
+    "course": "Piscina",
+    "zoneSystem": "Sistema de zonas",
+    "goalTime": "Tiempo objetivo",
+    "goalRaceAvg100": "Media carrera objetivo / 100",
+    "goalRaceAvg50": "Media carrera objetivo / 50",
+    "practiceRepeats": "Repeticiones de práctica",
+    "paceModel": "Modelo de ritmo",
+    "anchor": "Ancla",
+    "generated": "Generado",
+    "sheetName": "Zonas de entrenamiento",
+    "columns": {
+      "zone": "Zona",
+      "name": "Nombre",
+      "purpose": "Propósito",
+      "effort": "Esfuerzo",
+      "hr": "FC (lpm)",
+      "rpe": "RPE",
+      "rest": "Descanso",
+      "pace": "Ritmo / {{rep}}",
+      "vsRace": "vs carrera",
+      "reliability": "Fiabilidad",
+      "reliabilityNote": "Nota de fiabilidad"
+    },
+    "notes": "Notas",
+    "disclaimerLabel": "Aviso",
+    "disclaimer": "Los ritmos de zona son estimaciones a partir de tu tiempo objetivo (modelo {{paceModel}}). Trata cada ritmo como aproximadamente ±1–3 segundos por 100. No sustituyen pruebas de lactato, referencias CSS ni el diseño de series de tu entrenador."
+  }
+}

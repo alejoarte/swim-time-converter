@@ -1,0 +1,112 @@
+{
+  "anchor": "Goal race average (even split)",
+  "glossary": "A1 ≈ EN1 (aerobic base) · A2 ≈ EN2 · A3 / VO2 ≈ EN3 / SP1 · RP ≈ SP2 (race pace) · SP ≈ SP3. Older cruise-time and R/V zone names vary by coach — use the system your team uses. Fixed and percentage offset models both anchor to goal race average; treat paces as ±1–3 s per 100. HR ranges are general estimates; confirm targets with your coach.",
+  "offsetModels": {
+    "fixed": {
+      "label": "Fixed seconds",
+      "description": "Same +/− seconds per 100 regardless of speed (simple cruise-style ladder)."
+    },
+    "percent": {
+      "label": "Percentage",
+      "description": "Scales with your pace (Hy-Tek-style); better for very fast or slow swimmers."
+    }
+  },
+  "systems": {
+    "a-system": {
+      "label": "A-system (REC, A1, A2, A3, VO2, RP, SP)",
+      "description": "UK / European club tradition"
+    },
+    "us-system": {
+      "label": "US Swimming (REC, EN1–EN3, SP1–SP3)",
+      "description": "USA Swimming / Hy-Tek energy levels"
+    },
+    "dual": {
+      "label": "Dual labels (A + US codes)",
+      "description": "Both naming systems side by side"
+    }
+  },
+  "zoneNames": {
+    "aSystem": {
+      "recovery": "Recovery",
+      "lowAerobic": "Basic endurance",
+      "moderateAerobic": "Aerobic tempo",
+      "threshold": "Threshold",
+      "vo2": "Aerobic power",
+      "racePace": "Race pace",
+      "sprint": "Sprint"
+    },
+    "usSystem": {
+      "recovery": "Warm-up / Recovery",
+      "lowAerobic": "Aerobic base",
+      "moderateAerobic": "Aerobic development",
+      "threshold": "Threshold / VO2",
+      "vo2": "Best average",
+      "racePace": "Race pace",
+      "sprint": "Maximum speed"
+    }
+  },
+  "intensity": {
+    "recovery": {
+      "purpose": "Warm-up, cool-down, active recovery",
+      "restGuidance": "Choice / 15–30 s",
+      "reliabilityNote": "Coaches usually set recovery paces from feel or current threshold, not goal race time."
+    },
+    "lowAerobic": {
+      "purpose": "Basic endurance, aerobic base",
+      "restGuidance": "10–20 s",
+      "reliabilityNote": "Coaches usually set aerobic paces from current threshold/CSS, not goal race time."
+    },
+    "moderateAerobic": {
+      "purpose": "Aerobic development, technique at tempo",
+      "restGuidance": "10–20 s",
+      "reliabilityNote": "Coaches usually set aerobic paces from current threshold/CSS, not goal race time."
+    },
+    "threshold": {
+      "purpose": "Aerobic threshold, sustained quality",
+      "restGuidance": "10–30 s",
+      "reliabilityNote": "Useful guide; confirm with test sets or your coach."
+    },
+    "vo2": {
+      "purpose": "Aerobic power / VO2 max intervals",
+      "restGuidance": "20 s – 1:1",
+      "reliabilityNote": "Useful guide; confirm with test sets or your coach."
+    },
+    "racePace": {
+      "purpose": "Race-pace rehearsal, goal speed",
+      "restGuidance": "30 s – 1:2",
+      "reliabilityNote": "Best fit for goal-race planning."
+    },
+    "sprint": {
+      "purpose": "Power / speed, short maximal reps",
+      "restGuidance": "1:2 – full",
+      "reliabilityNote": "Best fit for goal-race planning."
+    }
+  },
+  "reliability": {
+    "high": "High",
+    "moderate": "Moderate",
+    "low": "Low"
+  },
+  "table": {
+    "heading": "Training zones",
+    "print": "Print",
+    "exportExcel": "Export to Excel",
+    "callout1": "Practice paces for <strong>{{repDistance}}-{{unit}}</strong> repeats, anchored to your <strong>{{anchor}}</strong>. Pace model: <strong>{{paceModel}}</strong>.",
+    "callout2": "If your goal time is aspirational, <strong>race pace (RP/SP2)</strong> and <strong>sprint (SP/SP3)</strong> are the most reliable targets. Aerobic zones (REC, A1/EN1, A2/EN2) are usually set from current threshold or CSS — confirm with your coach if unsure.",
+    "printMeta": "<strong>{{event}}</strong> ({{course}}) · Goal <strong>{{time}}</strong>",
+    "printMetaSystem": "Zone system: {{system}}",
+    "caption": "Training zone pace targets, effort guidance, and reliability labels.",
+    "columns": {
+      "zone": "Zone",
+      "purpose": "Purpose",
+      "effort": "Effort",
+      "hr": "HR",
+      "rpe": "RPE",
+      "rest": "Rest",
+      "pace": "Pace / {{rep}}",
+      "vsRace": "vs race",
+      "reliability": "Reliability"
+    },
+    "disclaimer": "Zone paces are estimates from your goal time ({{paceModel}} model). Treat each pace as roughly ±1–3 seconds per 100. They are not a substitute for lactate testing, CSS benchmarks, or your coach's set design. HR varies by age, fitness, and stroke."
+  }
+}
