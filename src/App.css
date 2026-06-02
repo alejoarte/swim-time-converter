@@ -709,6 +709,19 @@ th {
   .field-error {
     color: #ff8a80;
   }
+
+  .training-zones-row--race {
+    background: #1d2a3a;
+  }
+
+  .training-zones-pace--race {
+    color: #8ab4ff;
+  }
+
+  .training-zones-row--race .training-zones-name,
+  .training-zones-row--race .training-zones-reliability-note {
+    color: #9fb0c3;
+  }
 }
 
 @media print {
