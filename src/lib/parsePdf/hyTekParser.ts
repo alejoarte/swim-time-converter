@@ -5,13 +5,13 @@ import {
   parseHyTekEventTitle,
 } from './mapEvent'
 import { normalizePdfText } from './normalizePdfText'
+import { parseHeatContextLine } from './parseHeatContext'
 import { buildParsedRow, resetRowIds } from './rowBuilder'
 import type { DetectedMeetInfo, ParsedRow, ParsePdfResult } from './types'
 
 const EVENT_LINE =
   /^Event\s+\d+\s+.+\s+(\d{2,4})\s+(SC|LC)\s+(Yard|Meter)\s+(Freestyle|Backstroke|Breaststroke|Fly|Butterfly|IM)\s*$/i
 
-const HEAT_LINE = /^Heat\s+\d+/i
 const COLUMN_HEADER = /^Age\s+Name\s+Team/i
 const MEET_TITLE = /^\d{4}\s+.+\d{1,2}\/\d{1,2}\/\d{4}/
 
@@ -39,6 +39,8 @@ function parseSwimmerLine(
   eventLabel: string,
   eventId: string | null,
   sourceCourse: import('../convert').Course | null,
+  heatLabel?: string,
+  round?: import('./types').RowRound,
 ): ParsedRow | null {
   const timeMatch = line.match(TIME_PREFIX)
   if (!timeMatch) return null
@@ -92,6 +94,8 @@ function parseSwimmerLine(
     eventLabel,
     eventId,
     sourceCourse,
+    heatLabel,
+    round,
   })
 }
 
@@ -110,6 +114,8 @@ export function parseHyTekText(raw: string): ParsePdfResult {
   let currentEventLabel = ''
   let currentEventId: string | null = null
   let currentCourse: import('../convert').Course | null = null
+  let currentHeatLabel: string | undefined
+  let currentRound: import('./types').RowRound | undefined
 
   for (const line of lines) {
     if (MEET_TITLE.test(line)) {
@@ -134,6 +140,8 @@ export function parseHyTekText(raw: string): ParsePdfResult {
       if (currentCourse && detectedCourse && currentCourse !== detectedCourse) {
         warnings.push('Multiple courses detected in PDF; using first detected course as default.')
       }
+      currentHeatLabel = undefined
+      currentRound = undefined
       continue
     }
 
@@ -154,7 +162,14 @@ export function parseHyTekText(raw: string): ParsePdfResult {
       continue
     }
 
-    if (HEAT_LINE.test(line) || COLUMN_HEADER.test(line)) continue
+    const heatCtx = parseHeatContextLine(line)
+    if (heatCtx) {
+      currentHeatLabel = heatCtx.heatLabel
+      currentRound = heatCtx.round
+      continue
+    }
+
+    if (COLUMN_HEADER.test(line)) continue
 
     if (!currentEventLabel) continue
 
@@ -163,6 +178,8 @@ export function parseHyTekText(raw: string): ParsePdfResult {
       currentEventLabel,
       currentEventId,
       currentCourse,
+      currentHeatLabel,
+      currentRound,
     )
     if (row) rows.push(row)
   }

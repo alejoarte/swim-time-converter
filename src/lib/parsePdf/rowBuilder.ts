@@ -1,7 +1,7 @@
 import { getEventById } from '../../data/events'
 import type { Course } from '../convert'
 import { parseTime } from '../timeParse'
-import type { ParsedRow, ParseRowStatus } from './types'
+import type { ParsedRow, ParseRowStatus, RowRound } from './types'
 
 let rowCounter = 0
 
@@ -28,6 +28,8 @@ export type BuildParsedRowInput = {
   forceStatus?: ParseRowStatus
   included?: boolean
   sourceLineIndex?: number
+  heatLabel?: string
+  round?: RowRound
 }
 
 export function buildParsedRow(input: BuildParsedRowInput): ParsedRow {
@@ -87,5 +89,7 @@ export function buildParsedRow(input: BuildParsedRowInput): ParsedRow {
     issues,
     included,
     sourceLineIndex: input.sourceLineIndex,
+    heatLabel: input.heatLabel,
+    round: input.round,
   }
 }

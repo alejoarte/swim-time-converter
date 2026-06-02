@@ -28,6 +28,9 @@ export function ResultsTable({ results, onEditTimes, onExport }: ResultsTablePro
 
       <div className="table-wrapper">
         <table>
+          <caption className="visually-hidden">
+            Converted event times across SCY, SCM, and LCM.
+          </caption>
           <thead>
             <tr>
               <th>Event</th>

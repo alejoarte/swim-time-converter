@@ -11,7 +11,7 @@ After deploying to GitHub Pages, the app will be available at:
 ## Features
 
 - **Manual entry** — select one source course, pick events, enter times in `MM:SS.hh` or `SS.hh` format
-- **Import PDF** — upload Hy-Tek Meet Manager text PDFs, review parsed rows, convert an entire meet at once
+- **Import PDF** — upload Hy-Tek Meet Manager text PDFs; review the whole meet or find swimmers by name, then optionally send one swimmer to Manual entry
 - Generate conversion tables on demand (SCY, SCM, LCM columns)
 - Export single-athlete or full-meet results to Excel (`.xlsx`)
 - Comma decimal times (`59,24`) supported for European/Latin American meet sheets
@@ -55,9 +55,12 @@ Switch to **Import PDF** in the app to upload a meet sheet. Currently supported:
 - **Spanish layout** — team-first rows (`Evento … CL Metro Estilo Libre`)
 - Meet programs and results with the standard Hy-Tek row layouts
 
-The app extracts swimmer rows in your browser, shows a review table so you can fix bad rows, then converts all included rows and exports a meet spreadsheet with Name, Age, Team, Lane, Event, and SCY/SCM/LCM columns.
+After upload, choose **Review whole meet** or **Find swimmers**:
 
-If your PDF comes from a different timing system, parsing may fail or require manual fixes in the review step.
+- **Review whole meet** — fix bad rows in a full table, convert all included rows, and export a meet spreadsheet with Name, Age, Team, Lane, Event, and SCY/SCM/LCM columns.
+- **Find swimmers** — search and select one or more swimmers, then see each swimmer’s events and times (name, age, event, time). With exactly one swimmer selected, you can **Send to Manual converter** to prefill events and times for SCY/SCM/LCM conversion.
+
+If auto-parse fails, use **Match columns** to map your PDF layout. If your PDF comes from a different timing system, parsing may still require manual column mapping.
 
 ## Manual smoke test checklist
 
@@ -69,6 +72,8 @@ If your PDF comes from a different timing system, parsing may fail or require ma
 - [ ] App loads correctly from GitHub Pages URL (with `/swim-time-converter/` base path)
 - [ ] **Import PDF (English):** upload `programa finales sesion uno.pdf`, review rows, convert, export meet `.xlsx`
 - [ ] **Import PDF (Spanish):** upload `sesion uno programa de competencia.pdf`, review rows, convert, export meet `.xlsx`
+- [ ] **Find swimmers:** upload a text PDF, choose Find swimmers, select multiple names, confirm summary shows event counts and times
+- [ ] **PDF → Manual (1 swimmer):** select one swimmer in Find swimmers, Send to Manual converter, verify events and times prefilled on Manual entry tab
 
 ## Tech stack
 

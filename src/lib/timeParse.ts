@@ -28,6 +28,35 @@ export function parseTime(input: string): number | null {
 }
 
 /** Format centiseconds as MM:SS.hh (or SS.hh if under one minute). */
+/** Split centiseconds into manual entry fields (minutes may be empty for sub-minute times). */
+export function centisecondsToTimeParts(centiseconds: number): TimeParts {
+  const rounded = Math.round(centiseconds)
+  const totalSeconds = Math.floor(rounded / 100)
+  const hundredths = rounded % 100
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+
+  if (minutes > 0) {
+    return {
+      minutes: String(minutes),
+      seconds: seconds.toString().padStart(2, '0'),
+      hundredths: hundredths.toString().padStart(2, '0'),
+    }
+  }
+
+  return {
+    minutes: '',
+    seconds: String(seconds),
+    hundredths: hundredths.toString().padStart(2, '0'),
+  }
+}
+
+export function rawTimeToTimeParts(raw: string): TimeParts | null {
+  const cs = parseTime(raw)
+  if (cs === null) return null
+  return centisecondsToTimeParts(cs)
+}
+
 export function formatTime(centiseconds: number): string {
   const rounded = Math.round(centiseconds)
   const totalSeconds = Math.floor(rounded / 100)

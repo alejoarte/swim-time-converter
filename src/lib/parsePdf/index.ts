@@ -40,13 +40,28 @@ export {
 export type { ColumnCluster } from './inferPdfColumnLayout'
 export { isLikelyScannedPdf } from './columnMapping/isLikelyScannedPdf'
 export { LAYOUT_CONFIDENCE_MAPPER_THRESHOLD, DEFAULT_SKIP_PATTERNS } from './columnMapping/constants'
+export { buildParsedMeet, flattenParsedMeet } from './buildParsedMeet'
+export { parseHeatContextLine } from './parseHeatContext'
+export type { HeatContext } from './parseHeatContext'
+export { computeLayoutFingerprint } from './layoutFingerprint'
+export {
+  findMatchingProfile,
+  listMappingProfiles,
+  saveMappingProfile,
+} from './mappingProfiles'
+export type { SavedMappingProfile } from './mappingProfiles'
 export type {
   DetectedMeetInfo,
   EventRowContext,
+  MeetFormat,
+  ParsedMeet,
+  ParsedMeetEvent,
+  ParsedMeetHeat,
   ParsedRow,
   ParsePdfResult,
   ParseRowStatus,
   RowLayoutId,
+  RowRound,
 } from './types'
 export type {
   ColumnMappingConfig,

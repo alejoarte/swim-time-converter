@@ -2,6 +2,14 @@ import { getEventById, type Stroke, type SwimEvent } from '../data/events'
 
 export type Course = 'SCY' | 'SCM' | 'LCM'
 
+export const CLASSICAL_FACTOR_STANDARD = 1.11
+export const CLASSICAL_FACTOR_DISTANCE_OR_400_IM = 0.8925
+export const CLASSICAL_FACTOR_SCY_TO_LCM_1650_FREE = 1.02
+
+export const DISTANCE_INCRE_500_OR_400 = 640
+export const DISTANCE_INCRE_1000_OR_800 = 1280
+export const DISTANCE_INCRE_1650_OR_1500 = 2400
+
 const STROKE_INCRE: Record<Stroke, number> = {
   fly: 70,
   back: 60,
@@ -24,14 +32,16 @@ export function getFFactor(from: Course, to: Course, event: SwimEvent): number {
   if (from === 'LCM' && to === 'SCM') return 1.0
 
   if (isScyLcmDistancePair(event)) {
-    if (event.distance === 500 || event.distance === 1000) return 0.8925
+    if (event.distance === 500 || event.distance === 1000) {
+      return CLASSICAL_FACTOR_DISTANCE_OR_400_IM
+    }
     if (event.distance === 1650 || event.distance === 400) {
-      if (event.stroke === 'im') return 0.8925
-      if (event.distance === 1650) return 1.02
+      if (event.stroke === 'im') return CLASSICAL_FACTOR_DISTANCE_OR_400_IM
+      if (event.distance === 1650) return CLASSICAL_FACTOR_SCY_TO_LCM_1650_FREE
     }
   }
 
-  return 1.11
+  return CLASSICAL_FACTOR_STANDARD
 }
 
 function strokeDistanceIncre(event: SwimEvent): number {
@@ -44,9 +54,10 @@ function strokeDistanceIncre(event: SwimEvent): number {
 }
 
 function lcmScmDistanceIncre(event: SwimEvent): number | null {
-  if (event.distance === 500 || event.distance === 400) return 640
-  if (event.distance === 1000 || event.distance === 800) return 1280
-  if (event.distance === 1650 || event.distance === 1500) return 2400
+  if (event.distance === 500 || event.distance === 400) return DISTANCE_INCRE_500_OR_400
+  if (event.distance === 1000 || event.distance === 800) return DISTANCE_INCRE_1000_OR_800
+  if (event.distance === 1650 || event.distance === 1500)
+    return DISTANCE_INCRE_1650_OR_1500
   return null
 }
 
@@ -67,11 +78,11 @@ export function getFIncre(from: Course, to: Course, event: SwimEvent): number {
   }
 
   if (involvesScy && involvesLcm) {
-    if (event.stroke === 'im' && event.distance === 400) return 640
+    if (event.stroke === 'im' && event.distance === 400) return DISTANCE_INCRE_500_OR_400
     if (isDistanceFreeEvent(event)) {
-      if (event.distance === 500) return 640
-      if (event.distance === 1000) return 1280
-      if (event.distance === 1650) return 2400
+      if (event.distance === 500) return DISTANCE_INCRE_500_OR_400
+      if (event.distance === 1000) return DISTANCE_INCRE_1000_OR_800
+      if (event.distance === 1650) return DISTANCE_INCRE_1650_OR_1500
     }
     if (event.distance <= 200) return strokeDistanceIncre(event)
     return 0

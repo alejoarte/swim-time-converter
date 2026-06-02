@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type { ParsedRow } from './parsePdf/types'
-import { getUniqueSwimmers, nameMatches, swimmerKey } from './swimmerFilter'
+import {
+  getSwimmerSummaryStats,
+  getUniqueSwimmers,
+  nameMatches,
+  swimmerKey,
+} from './swimmerFilter'
 
 function makeRow(overrides: Partial<ParsedRow> & Pick<ParsedRow, 'swimmerName'>): ParsedRow {
   return {
@@ -58,5 +63,39 @@ describe('swimmerFilter', () => {
   it('matches all names when query is empty', () => {
     expect(nameMatches('Andres Garcia', '')).toBe(true)
     expect(nameMatches('Andres Garcia', '   ')).toBe(true)
+  })
+
+  it('computes distinct event count and appearances for selected swimmers', () => {
+    const rows = [
+      makeRow({
+        id: 'row-1',
+        swimmerName: 'Andres Garcia',
+        age: 14,
+        eventLabel: '100 Free',
+        eventId: '100-free',
+      }),
+      makeRow({
+        id: 'row-2',
+        swimmerName: 'Andres Garcia',
+        age: 14,
+        eventLabel: '200 Free',
+        eventId: '200-free',
+      }),
+      makeRow({
+        id: 'row-3',
+        swimmerName: 'Andres Garcia',
+        age: 14,
+        eventLabel: '100 Free',
+        eventId: '100-free',
+        rawTime: '59.50',
+      }),
+      makeRow({ id: 'row-4', swimmerName: 'Maria Lopez', age: 12 }),
+    ]
+
+    const andresKey = swimmerKey(rows[0])
+    const stats = getSwimmerSummaryStats(rows, new Set([andresKey]))
+    expect(stats).toHaveLength(1)
+    expect(stats[0].distinctEventCount).toBe(2)
+    expect(stats[0].rowCount).toBe(3)
   })
 })

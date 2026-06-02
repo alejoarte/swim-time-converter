@@ -3,6 +3,7 @@ import {
   isRelayEventText,
   parseHyTekEventTitle,
 } from './mapEvent'
+import { parseHeatContextLine } from './parseHeatContext'
 import { isPipeSeparatorLine } from './preprocessRowLine'
 import type { RowLayoutParser } from './rowLayouts'
 import type { Course } from '../convert'
@@ -66,7 +67,6 @@ function applyEventContext(
 
 export function isSpanishSkipLine(line: string): boolean {
   return (
-    SERIE_LINE.test(line) ||
     SPANISH_COLUMN_HEADER.test(line) ||
     RELAY_HEADER.test(line) ||
     NO_ENTRIES.test(line) ||
@@ -114,6 +114,18 @@ export function parseHyTekSpanishMeetLines(
         }
         if (detectedCourse === null && ctx.sourceCourse) {
           detectedCourse = ctx.sourceCourse
+        }
+      }
+      continue
+    }
+
+    const heatCtx = parseHeatContextLine(line)
+    if (heatCtx && !CONTINUATION_EVENT.test(line)) {
+      if (currentCtx) {
+        currentCtx = {
+          ...currentCtx,
+          heatLabel: heatCtx.heatLabel,
+          round: heatCtx.round,
         }
       }
       continue

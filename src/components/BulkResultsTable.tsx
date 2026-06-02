@@ -39,6 +39,9 @@ export function BulkResultsTable({
 
       <div className="table-wrapper table-wrapper--wide">
         <table>
+          <caption className="visually-hidden">
+            Converted meet rows by swimmer and event across SCY, SCM, and LCM.
+          </caption>
           <thead>
             <tr>
               <th>Name</th>

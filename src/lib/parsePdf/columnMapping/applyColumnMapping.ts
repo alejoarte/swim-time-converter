@@ -7,6 +7,7 @@ import {
 } from '../mapEvent'
 import { normalizePdfText } from '../normalizePdfText'
 import { parseTimeToken } from '../parseTimeToken'
+import { parseHeatContextLine } from '../parseHeatContext'
 import { buildParsedRow, resetRowIds } from '../rowBuilder'
 import type { DetectedMeetInfo, EventRowContext, ParsedRow } from '../types'
 import { classifyLine } from './classifyLine'
@@ -78,7 +79,7 @@ function detectMeetInfo(lines: string[], config: ColumnMappingConfig): DetectedM
   return {
     title,
     detectedCourse,
-    format: 'unknown',
+    format: 'column-mapped',
   }
 }
 
@@ -151,6 +152,8 @@ function parseMappedRow(
     forceStatus: timeResult.forceStatus,
     included: timeResult.included,
     sourceLineIndex,
+    heatLabel: ctx.heatLabel,
+    round: ctx.round,
   })
 }
 
@@ -173,11 +176,17 @@ export function applyColumnMapping(
 
   for (let i = 0; i < lines.length; i += 1) {
     const line = lines[i]
+    const heatCtx = parseHeatContextLine(line)
+    if (heatCtx) {
+      ctx = { ...ctx, heatLabel: heatCtx.heatLabel, round: heatCtx.round }
+      continue
+    }
+
     const kind = classifyLine(line, effectiveConfig, i)
 
     if (kind === 'event') {
       const nextCtx = resolveEventContext(line, effectiveConfig.meetDefaultCourse)
-      if (nextCtx) ctx = nextCtx
+      if (nextCtx) ctx = { ...nextCtx }
       continue
     }
 

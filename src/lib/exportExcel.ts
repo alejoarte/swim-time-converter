@@ -3,9 +3,24 @@ import { compareEventIds } from '../data/events'
 import { getOffsetModelLabel, ZONE_GLOSSARY } from '../data/trainingZoneSystems'
 import type { BulkConversionResult, ConversionResult, Course } from './convert'
 import { formatTime } from './timeParse'
-import { formatReliabilityLabel, formatVsRaceOffset, type TrainingZonePlan } from './trainingZones'
+import {
+  formatReliabilityLabel,
+  formatVsRaceOffset,
+  type TrainingZonePlan,
+} from './trainingZones'
 
 const COURSES: Course[] = ['SCY', 'SCM', 'LCM']
+
+const EXPORT_ERROR_MESSAGE =
+  'Could not export this Excel file. Close any open copy and try again.'
+
+function writeWorkbookFile(workbook: XLSX.WorkBook, fileName: string): void {
+  try {
+    XLSX.writeFile(workbook, fileName)
+  } catch {
+    throw new Error(EXPORT_ERROR_MESSAGE)
+  }
+}
 
 export type TrainingZoneExportParams = {
   eventLabel: string
@@ -106,21 +121,23 @@ export function exportTrainingZonesToExcel(params: TrainingZoneExportParams): vo
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Training Zones')
 
   const dateStamp = new Date().toISOString().slice(0, 10)
-  const slug = eventLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
-  XLSX.writeFile(workbook, `swim-training-zones-${slug || 'plan'}-${dateStamp}.xlsx`)
+  const slug = eventLabel
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+  writeWorkbookFile(workbook, `swim-training-zones-${slug || 'plan'}-${dateStamp}.xlsx`)
 }
 
-export function exportToExcel(
-  results: ConversionResult[],
-  sourceCourse: Course,
-): void {
+export function exportToExcel(results: ConversionResult[], sourceCourse: Course): void {
   const generatedAt = new Date().toLocaleString()
 
   const headerRows: (string | number)[][] = [
     ['Swim Time Converter'],
     ['Source course', sourceCourse],
     ['Generated', generatedAt],
-    ['Conversions use Classical (Colorado Timing) factors. Converted times are estimates and not official.'],
+    [
+      'Conversions use Classical (Colorado Timing) factors. Converted times are estimates and not official.',
+    ],
     [],
     ['Event', 'Source Course', 'Source Time', 'SCY', 'SCM', 'LCM'],
   ]
@@ -150,7 +167,7 @@ export function exportToExcel(
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Conversions')
 
   const dateStamp = new Date().toISOString().slice(0, 10)
-  XLSX.writeFile(workbook, `swim-conversions-${dateStamp}.xlsx`)
+  writeWorkbookFile(workbook, `swim-conversions-${dateStamp}.xlsx`)
 }
 
 export function exportMeetToExcel(
@@ -165,9 +182,22 @@ export function exportMeetToExcel(
     ...(meetTitle ? [['Meet', meetTitle]] : []),
     ['Source course', sourceCourse],
     ['Generated', generatedAt],
-    ['Conversions use Classical (Colorado Timing) factors. Converted times are estimates and not official.'],
+    [
+      'Conversions use Classical (Colorado Timing) factors. Converted times are estimates and not official.',
+    ],
     [],
-    ['Name', 'Age', 'Team', 'Lane', 'Event', 'Source Course', 'Source Time', 'SCY', 'SCM', 'LCM'],
+    [
+      'Name',
+      'Age',
+      'Team',
+      'Lane',
+      'Event',
+      'Source Course',
+      'Source Time',
+      'SCY',
+      'SCM',
+      'LCM',
+    ],
   ]
 
   const sortedResults = [...results].sort((a, b) => {
@@ -207,7 +237,7 @@ export function exportMeetToExcel(
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Meet Conversions')
 
   const dateStamp = new Date().toISOString().slice(0, 10)
-  XLSX.writeFile(workbook, `swim-meet-conversions-${dateStamp}.xlsx`)
+  writeWorkbookFile(workbook, `swim-meet-conversions-${dateStamp}.xlsx`)
 }
 
 export { COURSES }

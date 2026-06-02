@@ -56,6 +56,8 @@ function buildSwimmerRow(fields: {
     extraIssues: timeResult.extraIssues,
     forceStatus: timeResult.forceStatus,
     included: timeResult.included,
+    heatLabel: ctx.heatLabel,
+    round: ctx.round,
   })
 }
 

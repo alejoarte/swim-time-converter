@@ -5,7 +5,12 @@
 }
 
 :root {
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
   line-height: 1.5;
   color: #1a1a2e;
   background: #f0f4f8;
@@ -28,10 +33,33 @@ body {
   border: 0;
 }
 
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1000;
+  transform: translateY(-200%);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: #0d47a1;
+  color: #fff;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 .app {
   max-width: 900px;
   margin: 0 auto;
   padding: 1.5rem 1rem 2rem;
+}
+
+.app-error-state {
+  max-width: 40rem;
+  margin: 2rem auto;
+  text-align: center;
 }
 
 .app--wide {
@@ -42,7 +70,6 @@ body {
   display: flex;
   justify-content: center;
   gap: 0.5rem;
-  margin-bottom: 1.25rem;
 }
 
 .mode-switch-btn {
@@ -65,7 +92,9 @@ body {
   padding: 2rem 1rem;
   text-align: center;
   background: #fafbfc;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .drop-zone--active {
@@ -136,6 +165,103 @@ body {
 
 .swimmer-filter {
   margin: 0;
+}
+
+.swimmer-filter--standalone .swimmer-filter-list {
+  max-height: min(28rem, 55vh);
+}
+
+.pdf-choose-intent .intent-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.intent-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  text-align: left;
+  border: 1px solid #cfd8dc;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font: inherit;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.intent-card:hover {
+  border-color: #0288d1;
+  box-shadow: 0 2px 8px rgba(2, 136, 209, 0.12);
+}
+
+.intent-card-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #263238;
+}
+
+.intent-card-desc {
+  font-size: 0.875rem;
+  color: #546e7a;
+  line-height: 1.45;
+}
+
+.pdf-pick-swimmers-back,
+.pdf-preview-back-intent {
+  margin-top: 1rem;
+}
+
+.swimmer-results-summary {
+  margin-top: 1rem;
+}
+
+.swimmer-results-card {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #eceff1;
+  border-radius: 8px;
+  background: #fafbfc;
+}
+
+.swimmer-results-card-header {
+  margin-bottom: 0.75rem;
+}
+
+.swimmer-results-card-header h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.swimmer-results-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  font-size: 0.85rem;
+  color: #78909c;
+}
+
+.swimmer-results-table th,
+.swimmer-results-table td {
+  font-size: 0.875rem;
+}
+
+.swimmer-results-actions {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eceff1;
+}
+
+.swimmer-results-manual-bridge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
 }
 
 .swimmer-filter-search {
@@ -445,18 +571,22 @@ body {
   font-size: 0.85rem;
 }
 
-.app-header {
-  text-align: center;
-  margin-bottom: 2rem;
+.app-chrome {
+  margin-bottom: 1.25rem;
 }
 
-.app-header h1 {
+.app-branding {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.app-branding h1 {
   margin: 0 0 0.5rem;
   font-size: 1.75rem;
   color: #0d47a1;
 }
 
-.subtitle {
+.app-tagline {
   margin: 0;
   color: #546e7a;
   font-size: 0.95rem;
@@ -758,14 +888,14 @@ th {
   margin-left: 0.15rem;
 }
 
-.app-footer {
+.app-disclaimer {
   text-align: center;
   margin-top: 2rem;
   padding-top: 1rem;
   border-top: 1px solid #cfd8dc;
 }
 
-.app-footer p {
+.app-disclaimer p {
   margin: 0;
   font-size: 0.8rem;
   color: #78909c;
@@ -1505,6 +1635,105 @@ th {
   gap: 1rem;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #e6edf3;
+    background: #0d1117;
+  }
+
+  body {
+    background: #0d1117;
+    color: #e6edf3;
+  }
+
+  .app-branding h1 {
+    color: #8ab4ff;
+  }
+
+  .app-tagline,
+  .hint,
+  .meet-title,
+  .event-group-title,
+  .course-desc,
+  .time-field-label,
+  .time-sep,
+  .app-disclaimer p,
+  .status-detail {
+    color: #9fb0c3;
+  }
+
+  .app-main > section,
+  .swimmer-results-card,
+  .intent-card,
+  .drop-zone,
+  .column-field-picker,
+  .training-zones-callout,
+  .plan-results {
+    background: #161b22;
+    border-color: #2d333b;
+    box-shadow: none;
+  }
+
+  .plan-results {
+    border-left-color: #3b82f6;
+  }
+
+  .course-option,
+  .column-field-picker-btn,
+  .import-table select,
+  .import-time-input,
+  .event-select,
+  .zone-system-select,
+  .swimmer-filter-search,
+  .time-fields input {
+    background: #0f141a;
+    border-color: #3d444d;
+    color: #e6edf3;
+  }
+
+  .course-option:has(input:checked),
+  .source-cell,
+  .column-field-picker-btn--active {
+    background: #1d2a3a;
+    border-color: #4f8ef7;
+  }
+
+  button.secondary,
+  .mode-switch-btn {
+    background: #2d333b;
+    color: #e6edf3;
+  }
+
+  button.secondary:hover:not(:disabled),
+  .mode-switch-btn:hover:not(:disabled) {
+    background: #3d444d;
+  }
+
+  .mode-switch-btn--active {
+    background: #2563eb;
+    color: #ffffff;
+  }
+
+  table,
+  th,
+  td {
+    border-color: #2d333b;
+  }
+
+  th {
+    background: #0f141a;
+    color: #c9d1d9;
+  }
+
+  .app-disclaimer {
+    border-top-color: #2d333b;
+  }
+
+  .field-error {
+    color: #ff8a80;
+  }
+}
+
 @media (max-width: 768px) {
   .mapper-split-view {
     grid-template-columns: 1fr;
@@ -1520,9 +1749,8 @@ th {
     background: #fff;
   }
 
-  .app-header,
-  .mode-switch,
-  .app-footer,
+  .app-chrome,
+  .app-disclaimer,
   .plan-training > section:not(.plan-print-area),
   .plan-training .zone-system-section,
   .plan-training .pace-model-section,

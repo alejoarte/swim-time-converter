@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
+import { getUniqueEvents, type EventIdentity } from '../lib/eventFilter'
 import type { ParsedRow } from '../lib/parsePdf/types'
-import { getUniqueSwimmers, nameMatches } from '../lib/swimmerFilter'
 
-type SwimmerFilterPanelProps = {
+type EventFilterPanelProps = {
   rows: ParsedRow[]
   activeFilter: Set<string> | null
   onConfirm: (selectedKeys: Set<string>) => void
@@ -10,13 +10,19 @@ type SwimmerFilterPanelProps = {
   className?: string
 }
 
-export function SwimmerFilterPanel({
+function eventMatches(event: EventIdentity, query: string): boolean {
+  const trimmed = query.trim()
+  if (!trimmed) return true
+  return event.eventLabel.toLowerCase().includes(trimmed.toLowerCase())
+}
+
+export function EventFilterPanel({
   rows,
   activeFilter,
   onConfirm,
-  hintText = 'Search by name, check the swimmers you want, then confirm to filter the table below.',
+  hintText = 'Search by event name, check the events you want, then confirm to view those results.',
   className,
-}: SwimmerFilterPanelProps) {
+}: EventFilterPanelProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [pickerSelection, setPickerSelection] = useState<Set<string>>(new Set())
   const [showSelectedOnly, setShowSelectedOnly] = useState(false)
@@ -36,17 +42,17 @@ export function SwimmerFilterPanel({
     }
   }, [pickerSelection.size])
 
-  const uniqueSwimmers = useMemo(() => getUniqueSwimmers(rows), [rows])
+  const uniqueEvents = useMemo(() => getUniqueEvents(rows), [rows])
 
-  const visibleSwimmers = useMemo(
-    () => uniqueSwimmers.filter((swimmer) => nameMatches(swimmer.swimmerName, searchQuery)),
-    [uniqueSwimmers, searchQuery],
+  const visibleEvents = useMemo(
+    () => uniqueEvents.filter((event) => eventMatches(event, searchQuery)),
+    [uniqueEvents, searchQuery],
   )
 
-  const listSwimmers = useMemo(() => {
-    if (!showSelectedOnly) return visibleSwimmers
-    return visibleSwimmers.filter((swimmer) => pickerSelection.has(swimmer.key))
-  }, [visibleSwimmers, showSelectedOnly, pickerSelection])
+  const listEvents = useMemo(() => {
+    if (!showSelectedOnly) return visibleEvents
+    return visibleEvents.filter((event) => pickerSelection.has(event.key))
+  }, [visibleEvents, showSelectedOnly, pickerSelection])
 
   const togglePicker = (key: string, checked: boolean) => {
     setPickerSelection((prev) => {
@@ -61,7 +67,7 @@ export function SwimmerFilterPanel({
   }
 
   const selectAllShown = () => {
-    setPickerSelection(new Set(visibleSwimmers.map((swimmer) => swimmer.key)))
+    setPickerSelection(new Set(visibleEvents.map((event) => event.key)))
   }
 
   const clearPicker = () => {
@@ -74,16 +80,16 @@ export function SwimmerFilterPanel({
   }
 
   return (
-    <div className={className ? `swimmer-filter ${className}` : 'swimmer-filter'}>
+    <div className={className ? `event-filter ${className}` : 'event-filter'}>
       <p className="hint">{hintText}</p>
 
       <input
         type="search"
         className="swimmer-filter-search"
-        placeholder="Search by name (e.g. Andres)"
+        placeholder="Search by event (e.g. 100 Free)"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        aria-label="Search swimmers by name"
+        aria-label="Search events by name"
       />
 
       <div className="swimmer-filter-actions">
@@ -92,7 +98,7 @@ export function SwimmerFilterPanel({
             type="button"
             className="secondary"
             onClick={selectAllShown}
-            disabled={visibleSwimmers.length === 0}
+            disabled={visibleEvents.length === 0}
           >
             Select all shown
           </button>
@@ -127,27 +133,25 @@ export function SwimmerFilterPanel({
       </label>
 
       <ul className="swimmer-filter-list">
-        {listSwimmers.length === 0 ? (
+        {listEvents.length === 0 ? (
           <li className="swimmer-filter-empty">
             {showSelectedOnly
-              ? 'No selected swimmers match your search.'
-              : 'No swimmers match your search.'}
+              ? 'No selected events match your search.'
+              : 'No events match your search.'}
           </li>
         ) : (
-          listSwimmers.map((swimmer) => (
-            <li key={swimmer.key} className="swimmer-filter-item">
+          listEvents.map((event) => (
+            <li key={event.key} className="swimmer-filter-item">
               <label className="swimmer-filter-label">
                 <input
                   type="checkbox"
-                  checked={pickerSelection.has(swimmer.key)}
-                  onChange={(e) => togglePicker(swimmer.key, e.target.checked)}
+                  checked={pickerSelection.has(event.key)}
+                  onChange={(e) => togglePicker(event.key, e.target.checked)}
                 />
-                <span className="swimmer-filter-name">{swimmer.swimmerName}</span>
+                <span className="swimmer-filter-name">{event.eventLabel}</span>
                 <span className="swimmer-filter-meta">
-                  {swimmer.age != null && <span>Age {swimmer.age}</span>}
-                  {swimmer.team && <span>{swimmer.team}</span>}
                   <span>
-                    {swimmer.rowCount} event{swimmer.rowCount === 1 ? '' : 's'}
+                    {event.rowCount} result{event.rowCount === 1 ? '' : 's'}
                   </span>
                 </span>
               </label>

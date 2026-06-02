@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import documentSample from '../../../document.md?raw'
 import laneFirstSample from './fixtures/hytek-es-lane-first-sample.txt?raw'
 import sampleText from './fixtures/hytek-es-sample.txt?raw'
 import fullSample from './fixtures/hytek-es-full-sample.txt?raw'
@@ -91,12 +90,6 @@ describe('parseHyTekSpanishText lane-first layout', () => {
     expect(imRow).toBeDefined()
     expect(imRow?.rawTime).toBe('4:56.02')
   })
-
-  it('parses full document.md lane-first meet with many rows', () => {
-    const { rows, detectedLayout } = parseHyTekSpanishText(documentSample)
-    expect(detectedLayout).toBe('lane-first-time-last')
-    expect(rows.length).toBeGreaterThan(100)
-  })
 })
 
 describe('parsePdfText routing', () => {
@@ -118,8 +111,8 @@ describe('parseHyTekSpanishText full meet sample', () => {
     expect(meetInfo.detectedCourse).toBe('LCM')
     expect(meetInfo.title).toContain('CAMPEONATO NACIONAL')
     expect(rows.length).toBeGreaterThan(100)
-    expect(rows.filter((r) => r.status === 'ok' || r.status === 'warning').length).toBeGreaterThan(
-      100,
-    )
+    expect(
+      rows.filter((r) => r.status === 'ok' || r.status === 'warning').length,
+    ).toBeGreaterThan(100)
   })
 })

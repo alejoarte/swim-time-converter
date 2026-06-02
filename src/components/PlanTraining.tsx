@@ -10,7 +10,10 @@ import {
 import { type Course } from '../lib/convert'
 import { exportTrainingZonesToExcel } from '../lib/exportExcel'
 import { getLengthUnitLabel } from '../lib/pacing'
-import { computeTrainingZoneRows, shouldShowRaceAverageReference } from '../lib/trainingZones'
+import {
+  computeTrainingZoneRows,
+  shouldShowRaceAverageReference,
+} from '../lib/trainingZones'
 import {
   EMPTY_TIME_PARTS,
   formatTime,
@@ -31,6 +34,7 @@ export function PlanTraining() {
   const [offsetModel, setOffsetModel] = useState<OffsetModel>('fixed')
   const [goalTime, setGoalTime] = useState<TimeParts>(EMPTY_TIME_PARTS)
   const [goalShowErrors, setGoalShowErrors] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
 
   const event = getEventById(eventId)
   const goalCs = partsToCentiseconds(goalTime)
@@ -131,7 +135,8 @@ export function PlanTraining() {
               <p className="plan-summary-reference">
                 Goal race average (reference):{' '}
                 <strong>{formatTime(zonePlan.goalPacePer100Cs)}</strong> / 100 ·{' '}
-                <strong>{formatTime(zonePlan.goalPacePer50Cs)}</strong> / 50 ({lengthUnit}s)
+                <strong>{formatTime(zonePlan.goalPacePer50Cs)}</strong> / 50 ({lengthUnit}
+                s)
               </p>
             )}
           </section>
@@ -146,18 +151,34 @@ export function PlanTraining() {
               goalCentiseconds: goalCs,
             }}
             onExport={() =>
-              exportTrainingZonesToExcel({
-                eventLabel: event.label,
-                course,
-                zoneSystemLabel: getZoneSystem(zoneSystemId).label,
-                goalCentiseconds: goalCs,
-                lengthUnit,
-                plan: zonePlan,
-                showRaceAverageReference: shouldShowRaceAverageReference(event),
-              })
+              (() => {
+                setExportError(null)
+                try {
+                  exportTrainingZonesToExcel({
+                    eventLabel: event.label,
+                    course,
+                    zoneSystemLabel: getZoneSystem(zoneSystemId).label,
+                    goalCentiseconds: goalCs,
+                    lengthUnit,
+                    plan: zonePlan,
+                    showRaceAverageReference: shouldShowRaceAverageReference(event),
+                  })
+                } catch (error) {
+                  setExportError(
+                    error instanceof Error
+                      ? error.message
+                      : 'Failed to export training zones.',
+                  )
+                }
+              })()
             }
             onPrint={() => window.print()}
           />
+          {exportError && (
+            <p className="field-error" role="status" aria-live="polite">
+              {exportError}
+            </p>
+          )}
         </div>
       )}
     </div>

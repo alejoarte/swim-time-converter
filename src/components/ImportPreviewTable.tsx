@@ -61,7 +61,9 @@ export function ImportPreviewTable({
 
   const updateRow = (id: string, patch: Partial<ParsedRow>) => {
     onChange(
-      rows.map((row) => (row.id === id ? revalidateParsedRow({ ...row, ...patch }) : row)),
+      rows.map((row) =>
+        row.id === id ? revalidateParsedRow({ ...row, ...patch }) : row,
+      ),
     )
   }
 
@@ -98,19 +100,31 @@ export function ImportPreviewTable({
             : ` (${rows.length})`}
         </h2>
         <div className="button-group">
-          <button type="button" className="secondary" onClick={() => setFilterModalOpen(true)}>
+          <button
+            type="button"
+            className="secondary"
+            onClick={() => setFilterModalOpen(true)}
+          >
             Find swimmers
             {activeSwimmerFilter && (
               <span className="filter-badge"> ({activeSwimmerFilter.size})</span>
             )}
           </button>
           {activeSwimmerFilter && (
-            <button type="button" className="secondary" onClick={handleClearSwimmerFilter}>
+            <button
+              type="button"
+              className="secondary"
+              onClick={handleClearSwimmerFilter}
+            >
               Show all swimmers
             </button>
           )}
           {issueCount > 0 && (
-            <button type="button" className="secondary" onClick={() => setIssuesModalOpen(true)}>
+            <button
+              type="button"
+              className="secondary"
+              onClick={() => setIssuesModalOpen(true)}
+            >
               Review issues ({issueCount})
             </button>
           )}
@@ -131,6 +145,9 @@ export function ImportPreviewTable({
 
       <div className="table-wrapper table-wrapper--wide">
         <table className="import-table">
+          <caption className="visually-hidden">
+            Parsed PDF rows with status, event mapping, and include toggles.
+          </caption>
           <thead>
             <tr>
               <th>Include</th>
