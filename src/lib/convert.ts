@@ -1,4 +1,4 @@
-import { getEventById, type Stroke, type SwimEvent } from '../data/events'
+import type { Stroke, SwimEvent } from '../data/events'
 
 export type Course = 'SCY' | 'SCM' | 'LCM'
 
@@ -187,42 +187,4 @@ export function convertEntry(
     SCM: converted.SCM,
     LCM: converted.LCM,
   }
-}
-
-export type BulkConversionResult = ConversionResult & {
-  swimmerName: string
-  age?: number
-  team?: string
-  lane?: number
-  rawTime: string
-}
-
-export type BulkConvertInput = {
-  eventId: string
-  sourceCourse: Course
-  sourceCentiseconds: number
-  swimmerName: string
-  age?: number
-  team?: string
-  lane?: number
-  rawTime: string
-}
-
-export function convertBulkRows(rows: BulkConvertInput[]): BulkConversionResult[] {
-  return rows.flatMap((row) => {
-    const event = getEventById(row.eventId)
-    if (!event) return []
-
-    const converted = convertEntry(event, row.sourceCourse, row.sourceCentiseconds)
-    return [
-      {
-        ...converted,
-        swimmerName: row.swimmerName,
-        age: row.age,
-        team: row.team,
-        lane: row.lane,
-        rawTime: row.rawTime,
-      },
-    ]
-  })
 }

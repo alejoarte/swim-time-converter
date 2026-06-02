@@ -11,10 +11,10 @@ After deploying to GitHub Pages, the app will be available at:
 ## Features
 
 - **Manual entry** — select one source course, pick events, enter times in `MM:SS.hh` or `SS.hh` format
-- **Import PDF** — upload Hy-Tek Meet Manager text PDFs; review the whole meet or find swimmers by name, then optionally send one swimmer to Manual entry
+- **Plan training** — enter a goal time and generate training zone paces from multiple zone systems
 - Generate conversion tables on demand (SCY, SCM, LCM columns)
-- Export single-athlete or full-meet results to Excel (`.xlsx`)
-- Comma decimal times (`59,24`) supported for European/Latin American meet sheets
+- Export conversion or training zone results to Excel (`.xlsx`)
+- Comma decimal times (`59,24`) supported for European/Latin American entry
 
 ## Local development
 
@@ -46,22 +46,6 @@ Conversions use the Classical (Colorado Timing) factors documented by [SportsEng
 
 **Disclaimer:** Converted times are estimates and are not official. They cannot be used for records or qualification purposes.
 
-## PDF import
-
-Switch to **Import PDF** in the app to upload a meet sheet. Currently supported:
-
-- **Hy-Tek Meet Manager 8.0** text PDFs (not scanned/image PDFs)
-- **English layout** — time-first rows (`Event … LC Meter Freestyle`)
-- **Spanish layout** — team-first rows (`Evento … CL Metro Estilo Libre`)
-- Meet programs and results with the standard Hy-Tek row layouts
-
-After upload, choose **Review whole meet** or **Find swimmers**:
-
-- **Review whole meet** — fix bad rows in a full table, convert all included rows, and export a meet spreadsheet with Name, Age, Team, Lane, Event, and SCY/SCM/LCM columns.
-- **Find swimmers** — search and select one or more swimmers, then see each swimmer’s events and times (name, age, event, time). With exactly one swimmer selected, you can **Send to Manual converter** to prefill events and times for SCY/SCM/LCM conversion.
-
-If auto-parse fails, use **Match columns** to map your PDF layout. If your PDF comes from a different timing system, parsing may still require manual column mapping.
-
 ## Manual smoke test checklist
 
 - [ ] Select SCY, pick 100 Free, enter `1:02.34`, generate — LCM shows ~`1:10.80`
@@ -70,14 +54,10 @@ If auto-parse fails, use **Match columns** to map your PDF layout. If your PDF c
 - [ ] Edit times scrolls back and clears results
 - [ ] Export downloads a valid `.xlsx` file
 - [ ] App loads correctly from GitHub Pages URL (with `/swim-time-converter/` base path)
-- [ ] **Import PDF (English):** upload `programa finales sesion uno.pdf`, review rows, convert, export meet `.xlsx`
-- [ ] **Import PDF (Spanish):** upload `sesion uno programa de competencia.pdf`, review rows, convert, export meet `.xlsx`
-- [ ] **Find swimmers:** upload a text PDF, choose Find swimmers, select multiple names, confirm summary shows event counts and times
-- [ ] **PDF → Manual (1 swimmer):** select one swimmer in Find swimmers, Send to Manual converter, verify events and times prefilled on Manual entry tab
+- [ ] Plan training: enter goal time, verify zone table and Excel export
 
 ## Tech stack
 
 - Vite + React + TypeScript
 - Vitest (unit tests)
 - SheetJS (`xlsx`) for Excel export
-- pdf.js (`pdfjs-dist`) for client-side PDF text extraction

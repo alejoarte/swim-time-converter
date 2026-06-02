@@ -6,16 +6,14 @@ import { canGenerate, TimeEntryList } from './components/TimeEntryList'
 import { compareEventIds, getEventById } from './data/events'
 import { convertEntry, type ConversionResult, type Course } from './lib/convert'
 import { exportToExcel } from './lib/exportExcel'
-import type { ManualPrefill } from './lib/manualPrefill'
 import {
   EMPTY_TIME_PARTS,
   partsToCentiseconds,
-  rawTimeToTimeParts,
   type TimePart,
   type TimeParts,
 } from './lib/timeParse'
 
-type AppMode = 'manual' | 'import' | 'plan'
+type AppMode = 'manual' | 'plan'
 
 const MANUAL_STATE_STORAGE_KEY = 'swim-time-converter:manual-state:v1'
 
@@ -67,10 +65,6 @@ function loadSavedManualState(): SavedManualState | null {
   }
 }
 
-const PdfImport = lazy(() =>
-  import('./components/PdfImport').then((m) => ({ default: m.PdfImport })),
-)
-
 const PlanTraining = lazy(() =>
   import('./components/PlanTraining').then((m) => ({ default: m.PlanTraining })),
 )
@@ -94,37 +88,6 @@ function App() {
   const [results, setResults] = useState<ConversionResult[] | null>(null)
   const [locked, setLocked] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
-  const [pendingManualPrefill, setPendingManualPrefill] = useState<ManualPrefill | null>(
-    null,
-  )
-
-  useEffect(() => {
-    if (!pendingManualPrefill || mode !== 'manual') return
-
-    const { sourceCourse: course, entries } = pendingManualPrefill
-    const nextTimes: Record<string, TimeParts> = {}
-    const nextIds = new Set<string>()
-
-    for (const entry of entries) {
-      const parts = rawTimeToTimeParts(entry.rawTime)
-      if (!parts) continue
-      nextIds.add(entry.eventId)
-      nextTimes[entry.eventId] = parts
-    }
-
-    setSourceCourse(course)
-    setSelectedIds(nextIds)
-    setTimes(nextTimes)
-    setResults(null)
-    setLocked(false)
-    setShowErrors(false)
-    setExportError(null)
-    setPendingManualPrefill(null)
-
-    setTimeout(() => {
-      entryRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, 100)
-  }, [pendingManualPrefill, mode])
 
   useEffect(() => {
     try {
@@ -139,20 +102,13 @@ function App() {
     }
   }, [sourceCourse, selectedIds, times])
 
-  const handleSendToManualConverter = (prefill: ManualPrefill) => {
-    setPendingManualPrefill(prefill)
-    setMode('manual')
-  }
-
   const selectedList = [...selectedIds]
   const ready = canGenerate(selectedList, times)
   const announcement = results
     ? `Generated ${results.length} conversion result rows.`
-    : mode === 'import'
-      ? 'Import PDF mode.'
-      : mode === 'plan'
-        ? 'Plan training mode.'
-        : 'Manual entry mode.'
+    : mode === 'plan'
+      ? 'Plan training mode.'
+      : 'Manual entry mode.'
 
   const handleTimeChange = (eventId: string, part: TimePart, value: string) => {
     setTimes((prev) => ({
@@ -233,7 +189,7 @@ function App() {
   }
 
   return (
-    <div className={`app${mode === 'import' ? ' app--wide' : ''}`}>
+    <div className="app">
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
@@ -244,8 +200,7 @@ function App() {
         <div className="app-branding">
           <h1>Swim Time Converter</h1>
           <p className="app-tagline">
-            Convert times between SCY, SCM, and LCM, import meet results from PDF, and
-            plan training zones.
+            Convert times between SCY, SCM, and LCM, and plan training zones.
           </p>
         </div>
 
@@ -265,18 +220,6 @@ function App() {
           <button
             type="button"
             className={
-              mode === 'import'
-                ? 'mode-switch-btn mode-switch-btn--active'
-                : 'mode-switch-btn'
-            }
-            onClick={() => setMode('import')}
-            aria-current={mode === 'import' ? 'page' : undefined}
-          >
-            Import PDF
-          </button>
-          <button
-            type="button"
-            className={
               mode === 'plan'
                 ? 'mode-switch-btn mode-switch-btn--active'
                 : 'mode-switch-btn'
@@ -290,17 +233,7 @@ function App() {
       </header>
 
       <main id="main-content" ref={entryRef} className="app-main">
-        {mode === 'import' ? (
-          <Suspense
-            fallback={
-              <p className="hint" role="status">
-                Loading PDF import…
-              </p>
-            }
-          >
-            <PdfImport onSendToManualConverter={handleSendToManualConverter} />
-          </Suspense>
-        ) : mode === 'plan' ? (
+        {mode === 'plan' ? (
           <Suspense
             fallback={
               <p className="hint" role="status">
@@ -368,9 +301,9 @@ function App() {
 
       <footer className="app-disclaimer">
         <p>
-          Converted times use Classical (Colorado Timing) factors. Imported meet data and
-          training zone paces are parsed or estimated from your inputs. Nothing here is
-          official or a substitute for your coach&apos;s guidance.
+          Converted times use Classical (Colorado Timing) factors. Training zone paces are
+          estimated from your inputs. Nothing here is official or a substitute for your
+          coach&apos;s guidance.
         </p>
       </footer>
     </div>
