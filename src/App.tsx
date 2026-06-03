@@ -9,6 +9,11 @@ import { compareEventIds, getEventById } from './data/events'
 import { convertEntry, type ConversionResult, type Course } from './lib/convert'
 import { exportToExcel } from './lib/exportExcel'
 import {
+  hasPlanShareQuery,
+  parsePlanShareFromLocation,
+  type PlanShareState,
+} from './lib/shareUrl'
+import {
   EMPTY_TIME_PARTS,
   partsToCentiseconds,
   type TimePart,
@@ -37,6 +42,31 @@ function isTimeParts(value: unknown): value is TimeParts {
     typeof parts.seconds === 'string' &&
     typeof parts.hundredths === 'string'
   )
+}
+
+type InitialShareBootstrap = {
+  mode: AppMode
+  planShareInitial: PlanShareState | null
+  shareParseFailed: boolean
+}
+
+function getInitialShareBootstrap(): InitialShareBootstrap {
+  if (typeof window === 'undefined') {
+    return { mode: 'manual', planShareInitial: null, shareParseFailed: false }
+  }
+
+  const params = new URLSearchParams(window.location.search)
+  const planShareInitial = parsePlanShareFromLocation()
+
+  if (planShareInitial) {
+    return { mode: 'plan', planShareInitial, shareParseFailed: false }
+  }
+
+  if (hasPlanShareQuery(params)) {
+    return { mode: 'plan', planShareInitial: null, shareParseFailed: true }
+  }
+
+  return { mode: 'manual', planShareInitial: null, shareParseFailed: false }
 }
 
 function loadSavedManualState(): SavedManualState | null {
@@ -73,11 +103,12 @@ const PlanTraining = lazy(() =>
 
 function App() {
   const { t } = useTranslation()
+  const [shareBootstrap] = useState(getInitialShareBootstrap)
   const [savedManualState] = useState<SavedManualState | null>(() =>
     loadSavedManualState(),
   )
   const entryRef = useRef<HTMLDivElement>(null)
-  const [mode, setMode] = useState<AppMode>('manual')
+  const [mode, setMode] = useState<AppMode>(shareBootstrap.mode)
   const [sourceCourse, setSourceCourse] = useState<Course>(
     savedManualState?.sourceCourse ?? 'SCY',
   )
@@ -246,7 +277,10 @@ function App() {
               </p>
             }
           >
-            <PlanTraining />
+            <PlanTraining
+              initialFromShare={shareBootstrap.planShareInitial}
+              shareParseFailed={shareBootstrap.shareParseFailed}
+            />
           </Suspense>
         ) : (
           <>

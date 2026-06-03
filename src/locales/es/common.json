@@ -68,6 +68,15 @@
     "sourceMarkerTitle": "Tiempo introducido",
     "sourceHint": "* = tu tiempo introducido"
   },
+  "share": {
+    "copyLink": "Copiar enlace",
+    "copyLinkAria": "Copiar enlace para compartir este plan de entrenamiento",
+    "copied": "Enlace copiado",
+    "copyFailed": "No se pudo copiar. Selecciona y copia este enlace:",
+    "loadedBanner": "Plan de entrenamiento compartido cargado.",
+    "invalidBanner": "Este enlace está incompleto o no es válido. Introduce un tiempo objetivo abajo.",
+    "hint": "Cualquiera con este enlace puede ver tu tiempo objetivo y ritmos de entrenamiento."
+  },
   "plan": {
     "goalTime": "Tiempo objetivo",
     "zoneNaming": "Nomenclatura de zonas",

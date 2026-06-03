@@ -68,6 +68,15 @@
     "sourceMarkerTitle": "Source time",
     "sourceHint": "* = your entered time"
   },
+  "share": {
+    "copyLink": "Copy link",
+    "copyLinkAria": "Copy shareable link to this training plan",
+    "copied": "Link copied",
+    "copyFailed": "Could not copy. Select and copy this link:",
+    "loadedBanner": "Shared training plan loaded.",
+    "invalidBanner": "This link is incomplete or invalid. Enter a goal time below.",
+    "hint": "Anyone with this link can see your goal time and training paces."
+  },
   "plan": {
     "goalTime": "Goal time",
     "zoneNaming": "Zone naming",

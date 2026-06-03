@@ -3,7 +3,7 @@ import { getEventLabel, type Stroke, type SwimEvent } from '../data/events'
 export type Course = 'SCY' | 'SCM' | 'LCM'
 
 export const CLASSICAL_FACTOR_STANDARD = 1.11
-export const CLASSICAL_FACTOR_DISTANCE_OR_400_IM = 0.8925
+export const CLASSICAL_FACTOR_DISTANCE_FREE = 0.8925
 export const CLASSICAL_FACTOR_SCY_TO_LCM_1650_FREE = 1.02
 
 export const DISTANCE_INCRE_500_OR_400 = 640
@@ -23,7 +23,7 @@ function isDistanceFreeEvent(event: SwimEvent): boolean {
 }
 
 function isScyLcmDistancePair(event: SwimEvent): boolean {
-  return isDistanceFreeEvent(event) || (event.stroke === 'im' && event.distance === 400)
+  return isDistanceFreeEvent(event)
 }
 
 /** fFactor for Classical (Colorado Timing) conversion. */
@@ -33,11 +33,10 @@ export function getFFactor(from: Course, to: Course, event: SwimEvent): number {
 
   if (isScyLcmDistancePair(event)) {
     if (event.distance === 500 || event.distance === 1000) {
-      return CLASSICAL_FACTOR_DISTANCE_OR_400_IM
+      return CLASSICAL_FACTOR_DISTANCE_FREE
     }
-    if (event.distance === 1650 || event.distance === 400) {
-      if (event.stroke === 'im') return CLASSICAL_FACTOR_DISTANCE_OR_400_IM
-      if (event.distance === 1650) return CLASSICAL_FACTOR_SCY_TO_LCM_1650_FREE
+    if (event.distance === 1650) {
+      return CLASSICAL_FACTOR_SCY_TO_LCM_1650_FREE
     }
   }
 

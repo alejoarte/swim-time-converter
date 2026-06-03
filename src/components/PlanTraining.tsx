@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { getEventById, getEventLabel } from '../data/events'
 import {
@@ -13,11 +13,13 @@ import {
 import { type Course } from '../lib/convert'
 import { exportTrainingZonesToExcel } from '../lib/exportExcel'
 import { getLengthUnitLabel } from '../lib/pacing'
+import { buildPlanShareUrl, type PlanShareState } from '../lib/shareUrl'
 import {
   computeTrainingZoneRows,
   shouldShowRaceAverageReference,
 } from '../lib/trainingZones'
 import {
+  centisecondsToTimeParts,
   EMPTY_TIME_PARTS,
   formatTime,
   isTimePartsEmpty,
@@ -30,15 +32,53 @@ import { EventSelect } from './EventSelect'
 import { TimeFields } from './TimeFields'
 import { TrainingZonesTable } from './TrainingZonesTable'
 
-export function PlanTraining() {
+type PlanTrainingProps = {
+  initialFromShare?: PlanShareState | null
+  shareParseFailed?: boolean
+}
+
+function initialGoalTime(share: PlanShareState | null | undefined): TimeParts {
+  if (!share) return EMPTY_TIME_PARTS
+  return centisecondsToTimeParts(share.goalCentiseconds)
+}
+
+export function PlanTraining({
+  initialFromShare = null,
+  shareParseFailed = false,
+}: PlanTrainingProps) {
   const { t, i18n } = useTranslation()
-  const [course, setCourse] = useState<Course>('SCY')
-  const [eventId, setEventId] = useState('200-free')
-  const [zoneSystemId, setZoneSystemId] = useState<ZoneSystemId>('a-system')
-  const [offsetModel, setOffsetModel] = useState<OffsetModel>('fixed')
-  const [goalTime, setGoalTime] = useState<TimeParts>(EMPTY_TIME_PARTS)
+  const [course, setCourse] = useState<Course>(initialFromShare?.course ?? 'SCY')
+  const [eventId, setEventId] = useState(initialFromShare?.eventId ?? '200-free')
+  const [zoneSystemId, setZoneSystemId] = useState<ZoneSystemId>(
+    initialFromShare?.zoneSystemId ?? 'a-system',
+  )
+  const [offsetModel, setOffsetModel] = useState<OffsetModel>(
+    initialFromShare?.offsetModel ?? 'fixed',
+  )
+  const [goalTime, setGoalTime] = useState<TimeParts>(() =>
+    initialGoalTime(initialFromShare),
+  )
   const [goalShowErrors, setGoalShowErrors] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'failed'>('idle')
+  const [copyFallbackUrl, setCopyFallbackUrl] = useState<string | null>(null)
+  const copyStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const shareLanguageAppliedRef = useRef(false)
+
+  const showShareLoadedBanner = initialFromShare !== null
+  const showShareInvalidBanner = shareParseFailed
+
+  useEffect(() => {
+    if (!initialFromShare?.language || shareLanguageAppliedRef.current) return
+    shareLanguageAppliedRef.current = true
+    void i18n.changeLanguage(initialFromShare.language)
+  }, [initialFromShare?.language, i18n])
+
+  useEffect(() => {
+    return () => {
+      if (copyStatusTimerRef.current) clearTimeout(copyStatusTimerRef.current)
+    }
+  }, [])
 
   const event = getEventById(eventId)
   const goalCs = partsToCentiseconds(goalTime)
@@ -56,11 +96,48 @@ export function PlanTraining() {
     }
   }
 
+  const handleCopyLink = async () => {
+    if (!validGoal || goalCs === null) return
+
+    const url = buildPlanShareUrl({
+      course,
+      eventId,
+      goalCentiseconds: goalCs,
+      zoneSystemId,
+      offsetModel,
+      language: i18n.language === 'es' ? 'es' : 'en',
+    })
+
+    setCopyFallbackUrl(null)
+    setCopyStatus('idle')
+
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopyStatus('copied')
+      if (copyStatusTimerRef.current) clearTimeout(copyStatusTimerRef.current)
+      copyStatusTimerRef.current = setTimeout(() => setCopyStatus('idle'), 3000)
+    } catch {
+      setCopyStatus('failed')
+      setCopyFallbackUrl(url)
+    }
+  }
+
   const eventLabel = event ? getEventLabel(event.id) : ''
   const zoneSystemLabel = getZoneSystemLabel(zoneSystemId)
 
   return (
     <div className="plan-training">
+      {showShareLoadedBanner && (
+        <p className="share-banner share-banner--success" role="status">
+          {t('share.loadedBanner')}
+        </p>
+      )}
+      {showShareInvalidBanner && (
+        <p className="share-banner share-banner--warning" role="status">
+          {t('share.invalidBanner')}
+        </p>
+      )}
+
       <CourseSelector
         value={course}
         onChange={setCourse}
@@ -162,6 +239,30 @@ export function PlanTraining() {
             )}
           </section>
 
+          <p className="hint share-hint no-print">{t('share.hint')}</p>
+
+          {copyStatus === 'copied' && (
+            <p className="share-copy-status" role="status" aria-live="polite">
+              {t('share.copied')}
+            </p>
+          )}
+
+          {copyStatus === 'failed' && copyFallbackUrl && (
+            <div className="share-copy-fallback">
+              <p className="field-error" role="status">
+                {t('share.copyFailed')}
+              </p>
+              <input
+                className="share-copy-fallback-input"
+                type="text"
+                readOnly
+                value={copyFallbackUrl}
+                aria-label={t('share.copyLinkAria')}
+                onFocus={(e) => e.currentTarget.select()}
+              />
+            </div>
+          )}
+
           <TrainingZonesTable
             plan={zonePlan}
             lengthUnit={lengthUnit}
@@ -171,6 +272,7 @@ export function PlanTraining() {
               zoneSystemLabel,
               goalCentiseconds: goalCs,
             }}
+            onCopyLink={handleCopyLink}
             onExport={() =>
               (() => {
                 setExportError(null)

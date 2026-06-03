@@ -18,6 +18,7 @@ type TrainingZonesTableProps = {
   plan: TrainingZonePlan
   lengthUnit: 'yard' | 'meter'
   context: TrainingZonesTableContext
+  onCopyLink: () => void
   onExport: () => void
   onPrint: () => void
 }
@@ -26,10 +27,12 @@ export function TrainingZonesTable({
   plan,
   lengthUnit,
   context,
+  onCopyLink,
   onExport,
   onPrint,
 }: TrainingZonesTableProps) {
   const { t } = useTranslation('zones')
+  const { t: tCommon } = useTranslation()
   const repLabel = plan.practiceRepDistance === 50 ? '50' : '100'
   const unitLabel = lengthUnit === 'yard' ? 'yd' : 'm'
   const offsetModelLabel = getOffsetModelLabel(plan.offsetModel)
@@ -39,6 +42,14 @@ export function TrainingZonesTable({
       <div className="section-header">
         <h2>{t('table.heading')}</h2>
         <div className="button-group">
+          <button
+            type="button"
+            className="secondary"
+            onClick={onCopyLink}
+            aria-label={tCommon('share.copyLinkAria')}
+          >
+            {tCommon('share.copyLink')}
+          </button>
           <button type="button" className="secondary" onClick={onPrint}>
             {t('table.print')}
           </button>

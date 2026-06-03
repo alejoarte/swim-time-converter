@@ -256,7 +256,53 @@ body {
 
 .button-group {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+.share-banner {
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.share-banner--success {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.share-banner--warning {
+  background: #fff8e1;
+  color: #f57f17;
+  border: 1px solid #ffe082;
+}
+
+.share-hint {
+  margin: 0 0 0.75rem;
+}
+
+.share-copy-status {
+  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  color: #2e7d32;
+}
+
+.share-copy-fallback {
+  margin-bottom: 0.75rem;
+}
+
+.share-copy-fallback-input {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #cfd8dc;
+  border-radius: 4px;
+  margin-top: 0.35rem;
 }
 
 button {
