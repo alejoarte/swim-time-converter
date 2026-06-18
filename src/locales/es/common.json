@@ -13,6 +13,7 @@
   "mode": {
     "label": "Modo de entrada",
     "manual": "Entrada manual",
+    "convertTimes": "Convertir tiempos",
     "plan": "Planificar entrenamiento"
   },
   "announcements": {
@@ -83,7 +84,12 @@
     "hint": "Cualquiera con este enlace puede ver tu tiempo objetivo y ritmos de entrenamiento."
   },
   "plan": {
+    "cardTitle": "Planifica tu entrenamiento",
+    "cardSubtitle": "Introduce tu objetivo de carrera para generar zonas de entrenamiento personalizadas.",
     "goalTime": "Tiempo objetivo",
+    "goalPace": "Ritmo objetivo",
+    "goalPaceTotal": "{{time}} total",
+    "advancedSettings": "Ajustes avanzados",
     "zoneNaming": "Nomenclatura de zonas",
     "zoneNamingHint": "Usa el sistema que utilice tu club o entrenador.",
     "zoneSystemAria": "Sistema de nomenclatura de zonas",

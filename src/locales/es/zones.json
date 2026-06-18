@@ -87,8 +87,47 @@
     "moderate": "Moderada",
     "low": "Baja"
   },
+  "simplified": {
+    "recovery": {
+      "title": "Recuperación",
+      "subtitle": "Recuperación activa",
+      "effort": "Muy fácil / Conversacional",
+      "rpe": "2–3 / Fácil"
+    },
+    "aerobic": {
+      "title": "Aeróbico",
+      "subtitle": "Desarrollo de resistencia",
+      "effort": "Fácil a moderado / Cómodo",
+      "rpe": "3–5 / Moderado"
+    },
+    "threshold": {
+      "title": "Umbral",
+      "subtitle": "Umbral de lactato",
+      "effort": "Moderado a intenso / Incomodidad controlada",
+      "rpe": "6–7 / Intenso"
+    },
+    "racePace": {
+      "title": "Ritmo de carrera",
+      "subtitle": "Específico de carrera",
+      "effort": "Intenso / Potencia sostenible",
+      "rpe": "8–10 / Muy intenso"
+    }
+  },
   "table": {
     "heading": "Zonas de entrenamiento",
+    "subtitle": "Los ritmos son por 100 {{unit}}. Ajústalos según sensación y condiciones.",
+    "goalBadge": "Basado en {{event}} – objetivo {{goal}}",
+    "hrDisclaimer": "Las zonas de frecuencia cardíaca son estimaciones. Usa tus propios datos para afinarlas. Escucha siempre a tu cuerpo.",
+    "showDetails": "Mostrar detalle completo de zonas",
+    "hideDetails": "Ocultar detalle completo de zonas",
+    "coachColumns": {
+      "zone": "Zona",
+      "pace": "Ritmo (por 100{{unit}})",
+      "effort": "Esfuerzo",
+      "hr": "Frecuencia cardíaca (% del máx.)",
+      "rpe": "RPE (1–10)"
+    },
+    "metricPace": "({{range}} / 100m)",
     "print": "Imprimir",
     "exportExcel": "Exportar a Excel",
     "callout1": "Ritmos de práctica para repeticiones de <strong>{{repDistance}}-{{unit}}</strong>, anclados a tu <strong>{{anchor}}</strong>. Modelo de ritmo: <strong>{{paceModel}}</strong>.",

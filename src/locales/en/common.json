@@ -13,6 +13,7 @@
   "mode": {
     "label": "Entry mode",
     "manual": "Manual entry",
+    "convertTimes": "Convert times",
     "plan": "Plan training"
   },
   "announcements": {
@@ -83,7 +84,12 @@
     "hint": "Anyone with this link can see your goal time and training paces."
   },
   "plan": {
+    "cardTitle": "Plan Your Training",
+    "cardSubtitle": "Enter your race goal to generate personalized training zones.",
     "goalTime": "Goal time",
+    "goalPace": "Goal Pace",
+    "goalPaceTotal": "{{time}} total",
+    "advancedSettings": "Advanced settings",
     "zoneNaming": "Zone naming",
     "zoneNamingHint": "Match the system your coach or club uses.",
     "zoneSystemAria": "Training zone naming system",

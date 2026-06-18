@@ -2,7 +2,7 @@ import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CourseSelector } from './components/CourseSelector'
 import { EventPicker } from './components/EventPicker'
-import { IconCalendar, IconPencil } from './components/icons'
+import { IconSwimmer } from './components/icons'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { ResultsTable } from './components/ResultsTable'
 import { canGenerate, TimeEntryList } from './components/TimeEntryList'
@@ -224,49 +224,50 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <>
       <a href="#main-content" className="skip-link">
         {t('skipToMain')}
       </a>
       <p className="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
         {announcement}
       </p>
-      <header className="app-chrome">
-        <div className="app-chrome__top">
-          <h1>{t('app.title')}</h1>
+      <header className="app-nav">
+        <div className="app-nav__inner">
+          <div className="app-nav__brand">
+            <IconSwimmer className="app-nav__logo" size={28} />
+            <span className="app-nav__title">{t('app.title')}</span>
+          </div>
+
+          <nav className="app-nav__links" aria-label={t('mode.label')}>
+            <button
+              type="button"
+              className={
+                mode === 'manual'
+                  ? 'app-nav__link app-nav__link--active'
+                  : 'app-nav__link'
+              }
+              onClick={() => setMode('manual')}
+              aria-current={mode === 'manual' ? 'page' : undefined}
+            >
+              {t('mode.convertTimes')}
+            </button>
+            <button
+              type="button"
+              className={
+                mode === 'plan' ? 'app-nav__link app-nav__link--active' : 'app-nav__link'
+              }
+              onClick={() => setMode('plan')}
+              aria-current={mode === 'plan' ? 'page' : undefined}
+            >
+              {t('mode.plan')}
+            </button>
+          </nav>
+
           <LanguageSwitcher />
         </div>
-
-        <nav className="segmented-control" aria-label={t('mode.label')}>
-          <button
-            type="button"
-            className={
-              mode === 'manual'
-                ? 'segmented-control__btn segmented-control__btn--active'
-                : 'segmented-control__btn'
-            }
-            onClick={() => setMode('manual')}
-            aria-current={mode === 'manual' ? 'page' : undefined}
-          >
-            <IconPencil size={16} />
-            {t('mode.manual')}
-          </button>
-          <button
-            type="button"
-            className={
-              mode === 'plan'
-                ? 'segmented-control__btn segmented-control__btn--active'
-                : 'segmented-control__btn'
-            }
-            onClick={() => setMode('plan')}
-            aria-current={mode === 'plan' ? 'page' : undefined}
-          >
-            <IconCalendar size={16} />
-            {t('mode.plan')}
-          </button>
-        </nav>
       </header>
 
+      <div className={`app${mode === 'plan' ? ' app--plan' : ''}`}>
       <main id="main-content" ref={entryRef} className="app-main">
         {mode === 'plan' ? (
           <Suspense
@@ -342,7 +343,8 @@ function App() {
       <footer className="app-disclaimer">
         <p>{t('disclaimer')}</p>
       </footer>
-    </div>
+      </div>
+    </>
   )
 }
 

@@ -87,8 +87,47 @@
     "moderate": "Moderate",
     "low": "Low"
   },
+  "simplified": {
+    "recovery": {
+      "title": "Recovery",
+      "subtitle": "Active recovery",
+      "effort": "Very easy / Conversational",
+      "rpe": "2–3 / Easy"
+    },
+    "aerobic": {
+      "title": "Aerobic",
+      "subtitle": "Endurance building",
+      "effort": "Easy to moderate / Comfortable",
+      "rpe": "3–5 / Moderate"
+    },
+    "threshold": {
+      "title": "Threshold",
+      "subtitle": "Lactate threshold",
+      "effort": "Moderate to hard / Controlled discomfort",
+      "rpe": "6–7 / Hard"
+    },
+    "racePace": {
+      "title": "Race Pace",
+      "subtitle": "Race specific",
+      "effort": "Hard / Sustainable power",
+      "rpe": "8–10 / Very hard"
+    }
+  },
   "table": {
-    "heading": "Training zones",
+    "heading": "Training Zones",
+    "subtitle": "Paces are per 100 {{unit}}. Adjust based on feel and conditions.",
+    "goalBadge": "Based on {{event}} – {{goal}} Goal",
+    "hrDisclaimer": "Heart rate zones are estimates. Use your own data to refine. Always listen to your body.",
+    "showDetails": "Show full zone details",
+    "hideDetails": "Hide full zone details",
+    "coachColumns": {
+      "zone": "Zone",
+      "pace": "Pace (per 100{{unit}})",
+      "effort": "Effort",
+      "hr": "Heart Rate (% of Max)",
+      "rpe": "RPE (1–10)"
+    },
+    "metricPace": "({{range}} / 100m)",
     "print": "Print",
     "exportExcel": "Export to Excel",
     "callout1": "Practice paces for <strong>{{repDistance}}-{{unit}}</strong> repeats, anchored to your <strong>{{anchor}}</strong>. Pace model: <strong>{{paceModel}}</strong>.",
