@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   EVENT_GROUP_KEYS,
@@ -8,6 +9,7 @@ import {
   type EventSubgroup,
   type SwimEvent,
 } from '../data/events'
+import { IconSearch } from './icons'
 
 type EventPickerProps = {
   selectedIds: Set<string>
@@ -15,7 +17,34 @@ type EventPickerProps = {
   disabled?: boolean
 }
 
-function EventCheckboxes({
+function EventListRow({
+  event,
+  checked,
+  onToggle,
+  disabled,
+}: {
+  event: SwimEvent
+  checked: boolean
+  onToggle: (id: string) => void
+  disabled?: boolean
+}) {
+  const id = `event-${event.id}`
+  return (
+    <label className="event-list-row" htmlFor={id}>
+      <input
+        id={id}
+        type="checkbox"
+        className="event-list-checkbox"
+        checked={checked}
+        onChange={() => onToggle(event.id)}
+        disabled={disabled}
+      />
+      <span className="event-list-label">{getEventLabel(event.id)}</span>
+    </label>
+  )
+}
+
+function EventListRows({
   events,
   selectedIds,
   onToggle,
@@ -27,19 +56,17 @@ function EventCheckboxes({
   disabled?: boolean
 }) {
   return (
-    <div className="event-checkboxes">
+    <>
       {events.map((event) => (
-        <label key={event.id} className="event-checkbox">
-          <input
-            type="checkbox"
-            checked={selectedIds.has(event.id)}
-            onChange={() => onToggle(event.id)}
-            disabled={disabled}
-          />
-          {getEventLabel(event.id)}
-        </label>
+        <EventListRow
+          key={event.id}
+          event={event}
+          checked={selectedIds.has(event.id)}
+          onToggle={onToggle}
+          disabled={disabled}
+        />
       ))}
-    </div>
+    </>
   )
 }
 
@@ -53,7 +80,7 @@ function renderGroupEvents(
 
   if (subgroups.length <= 1 && !subgroups[0]) {
     return (
-      <EventCheckboxes
+      <EventListRows
         events={groupEvents}
         selectedIds={selectedIds}
         onToggle={toggleEvent}
@@ -79,9 +106,11 @@ function renderGroupEvents(
   return (
     <>
       {sections.map((section) => (
-        <div key={section.label ?? 'main'} className="event-subgroup">
-          {section.label && <p className="event-group-title event-subgroup-title">{section.label}</p>}
-          <EventCheckboxes
+        <div key={section.label ?? 'main'} className="event-list-group">
+          {section.label && (
+            <p className="event-list-group-title">{section.label}</p>
+          )}
+          <EventListRows
             events={section.events}
             selectedIds={selectedIds}
             onToggle={toggleEvent}
@@ -95,6 +124,7 @@ function renderGroupEvents(
 
 export function EventPicker({ selectedIds, onChange, disabled }: EventPickerProps) {
   const { t } = useTranslation()
+  const [search, setSearch] = useState('')
 
   const toggleEvent = (id: string) => {
     const next = new Set(selectedIds)
@@ -114,29 +144,79 @@ export function EventPicker({ selectedIds, onChange, disabled }: EventPickerProp
     onChange(new Set())
   }
 
+  const query = search.trim().toLowerCase()
+  const filteredEvents = useMemo(() => {
+    if (!query) return null
+    return EVENTS.filter((e) => getEventLabel(e.id).toLowerCase().includes(query))
+  }, [query])
+
   return (
-    <section className="event-picker">
-      <div className="section-header">
-        <h2>{t('eventPicker.heading')}</h2>
-        <div className="button-group">
-          <button type="button" onClick={selectAll} disabled={disabled}>
+    <div className="event-picker">
+      <div className="event-picker-top">
+        <span className="field-label">{t('eventPicker.heading')}</span>
+        <div
+          className="event-picker-toolbar"
+          role="group"
+          aria-label={t('eventPicker.bulkActionsAria')}
+        >
+          <button
+            type="button"
+            className="event-picker-action-btn"
+            onClick={selectAll}
+            disabled={disabled}
+          >
             {t('eventPicker.selectAll')}
           </button>
-          <button type="button" onClick={clearAll} disabled={disabled}>
+          <button
+            type="button"
+            className="event-picker-action-btn"
+            onClick={clearAll}
+            disabled={disabled}
+          >
             {t('eventPicker.clearAll')}
           </button>
         </div>
       </div>
 
-      {EVENT_GROUP_KEYS.map((groupKey) => {
-        const groupEvents = EVENTS.filter((e) => e.group === groupKey)
-        return (
-          <div key={groupKey} className="event-group">
-            <h3 className="event-group-title">{getEventGroupLabel(groupKey)}</h3>
-            {renderGroupEvents(groupEvents, selectedIds, toggleEvent, disabled)}
-          </div>
-        )
-      })}
-    </section>
+      <div className="event-list-panel">
+        <div className="event-search-wrap">
+          <IconSearch className="event-search-icon" size={16} />
+          <input
+            type="search"
+            className="event-search-input"
+            placeholder={t('eventPicker.searchPlaceholder')}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            disabled={disabled}
+            aria-label={t('eventPicker.searchPlaceholder')}
+          />
+        </div>
+
+        <div className="event-list-scroll">
+          {filteredEvents ? (
+            filteredEvents.length > 0 ? (
+              <EventListRows
+                events={filteredEvents}
+                selectedIds={selectedIds}
+                onToggle={toggleEvent}
+                disabled={disabled}
+              />
+            ) : (
+              <p className="event-list-empty hint">{t('eventPicker.noResults')}</p>
+            )
+          ) : (
+            EVENT_GROUP_KEYS.map((groupKey) => {
+              const groupEvents = EVENTS.filter((e) => e.group === groupKey)
+              return (
+                <div key={groupKey} className="event-list-group">
+                  <p className="event-list-group-title">{getEventGroupLabel(groupKey)}</p>
+                  {renderGroupEvents(groupEvents, selectedIds, toggleEvent, disabled)}
+                </div>
+              )
+            })
+          )}
+        </div>
+      </div>
+    </div>
   )
 }

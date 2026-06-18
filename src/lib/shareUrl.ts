@@ -106,13 +106,12 @@ export function parsePlanShareFromLocation(loc?: Location): PlanShareState | nul
   return parsePlanShareFromSearchParams(new URLSearchParams(location.search))
 }
 
-export function buildPlanShareUrl(
-  state: PlanShareState,
-  baseHref?: string,
-): string {
+export function buildPlanShareUrl(state: PlanShareState, baseHref?: string): string {
   const href =
     baseHref ??
-    (typeof window !== 'undefined' ? window.location.href : 'http://localhost/swim-time-converter/')
+    (typeof window !== 'undefined'
+      ? window.location.href
+      : 'http://localhost/swim-time-converter/')
   const url = new URL(href)
 
   url.searchParams.set('plan', SHARE_QUERY_VERSION)

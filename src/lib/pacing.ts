@@ -32,8 +32,7 @@ export function goalPaceFromTime(
   lapCount: number,
 ): GoalPaceResult {
   const pacePer50 = Math.round(goalCentiseconds / lapCount)
-  const pacePer100 =
-    lapCount >= 2 ? Math.round(goalCentiseconds / (lapCount / 2)) : null
+  const pacePer100 = lapCount >= 2 ? Math.round(goalCentiseconds / (lapCount / 2)) : null
 
   return { pacePer50, pacePer100, lapCount }
 }

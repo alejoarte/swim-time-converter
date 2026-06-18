@@ -143,6 +143,7 @@ export function PlanTraining({
         onChange={setCourse}
         heading={t('course.headingPlan')}
         name="plan-course"
+        showSourceHint={false}
       />
 
       <EventSelect value={eventId} onChange={setEventId} />

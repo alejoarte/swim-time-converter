@@ -4,7 +4,11 @@ import { getOffsetModelLabel, getZoneGlossary } from '../data/trainingZoneSystem
 import i18n from '../i18n'
 import type { ConversionResult, Course } from './convert'
 import { formatTime } from './timeParse'
-import { formatReliabilityLabel, formatVsRaceOffset, type TrainingZonePlan } from './trainingZones'
+import {
+  formatReliabilityLabel,
+  formatVsRaceOffset,
+  type TrainingZonePlan,
+} from './trainingZones'
 
 const COURSES: Course[] = ['SCY', 'SCM', 'LCM']
 
@@ -62,7 +66,10 @@ export function exportTrainingZonesToExcel(params: TrainingZoneExportParams): vo
       i18n.t('trainingZones.practiceRepeats', { ns: 'export' }),
       `${plan.practiceRepDistance}-${unitLabel}`,
     ],
-    [i18n.t('trainingZones.paceModel', { ns: 'export' }), getOffsetModelLabel(plan.offsetModel)],
+    [
+      i18n.t('trainingZones.paceModel', { ns: 'export' }),
+      getOffsetModelLabel(plan.offsetModel),
+    ],
     [i18n.t('trainingZones.anchor', { ns: 'export' }), plan.anchorLabel],
     [i18n.t('trainingZones.generated', { ns: 'export' }), generatedAt],
     [],
@@ -123,7 +130,11 @@ export function exportTrainingZonesToExcel(params: TrainingZoneExportParams): vo
   ]
 
   const workbook = XLSX.utils.book_new()
-  XLSX.utils.book_append_sheet(workbook, worksheet, i18n.t('trainingZones.sheetName', { ns: 'export' }))
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    i18n.t('trainingZones.sheetName', { ns: 'export' }),
+  )
 
   const dateStamp = new Date().toISOString().slice(0, 10)
   const slug = eventLabel
@@ -173,7 +184,11 @@ export function exportToExcel(results: ConversionResult[], sourceCourse: Course)
   ]
 
   const workbook = XLSX.utils.book_new()
-  XLSX.utils.book_append_sheet(workbook, worksheet, i18n.t('conversions.sheetName', { ns: 'export' }))
+  XLSX.utils.book_append_sheet(
+    workbook,
+    worksheet,
+    i18n.t('conversions.sheetName', { ns: 'export' }),
+  )
 
   const dateStamp = new Date().toISOString().slice(0, 10)
   writeWorkbookFile(workbook, `swim-conversions-${dateStamp}.xlsx`)

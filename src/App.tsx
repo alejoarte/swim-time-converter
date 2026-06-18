@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CourseSelector } from './components/CourseSelector'
 import { EventPicker } from './components/EventPicker'
+import { IconCalendar, IconPencil } from './components/icons'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { ResultsTable } from './components/ResultsTable'
 import { canGenerate, TimeEntryList } from './components/TimeEntryList'
@@ -218,9 +219,7 @@ function App() {
     try {
       exportToExcel(results, sourceCourse)
     } catch (error) {
-      setExportError(
-        error instanceof Error ? error.message : t('exportError'),
-      )
+      setExportError(error instanceof Error ? error.message : t('exportError'))
     }
   }
 
@@ -233,36 +232,36 @@ function App() {
         {announcement}
       </p>
       <header className="app-chrome">
-        <div className="app-branding">
+        <div className="app-chrome__top">
           <h1>{t('app.title')}</h1>
-          <p className="app-tagline">{t('app.tagline')}</p>
+          <LanguageSwitcher />
         </div>
 
-        <LanguageSwitcher />
-
-        <nav className="mode-switch" aria-label={t('mode.label')}>
+        <nav className="segmented-control" aria-label={t('mode.label')}>
           <button
             type="button"
             className={
               mode === 'manual'
-                ? 'mode-switch-btn mode-switch-btn--active'
-                : 'mode-switch-btn'
+                ? 'segmented-control__btn segmented-control__btn--active'
+                : 'segmented-control__btn'
             }
             onClick={() => setMode('manual')}
             aria-current={mode === 'manual' ? 'page' : undefined}
           >
+            <IconPencil size={16} />
             {t('mode.manual')}
           </button>
           <button
             type="button"
             className={
               mode === 'plan'
-                ? 'mode-switch-btn mode-switch-btn--active'
-                : 'mode-switch-btn'
+                ? 'segmented-control__btn segmented-control__btn--active'
+                : 'segmented-control__btn'
             }
             onClick={() => setMode('plan')}
             aria-current={mode === 'plan' ? 'page' : undefined}
           >
+            <IconCalendar size={16} />
             {t('mode.plan')}
           </button>
         </nav>
@@ -284,17 +283,19 @@ function App() {
           </Suspense>
         ) : (
           <>
-            <CourseSelector
-              value={sourceCourse}
-              onChange={handleCourseChange}
-              disabled={locked}
-            />
+            <div className="card card-grid-2 manual-input-card">
+              <CourseSelector
+                value={sourceCourse}
+                onChange={handleCourseChange}
+                disabled={locked}
+              />
 
-            <EventPicker
-              selectedIds={selectedIds}
-              onChange={handleSelectedChange}
-              disabled={locked}
-            />
+              <EventPicker
+                selectedIds={selectedIds}
+                onChange={handleSelectedChange}
+                disabled={locked}
+              />
+            </div>
 
             <TimeEntryList
               sourceCourse={sourceCourse}

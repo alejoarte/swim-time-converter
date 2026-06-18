@@ -28,14 +28,19 @@
   "disclaimer": "Converted times use Classical (Colorado Timing) factors. Training zone paces are estimated from your inputs. Nothing here is official or a substitute for your coach's guidance.",
   "exportError": "Failed to export results.",
   "course": {
-    "headingDefault": "My times are in",
+    "headingDefault": "Select course",
     "headingPlan": "Pool course",
     "scyDesc": "Short Course Yards",
     "scmDesc": "Short Course Meters",
-    "lcmDesc": "Long Course Meters"
+    "lcmDesc": "Long Course Meters",
+    "sourceHint": "* Source course",
+    "selectAria": "Select source course"
   },
   "eventPicker": {
-    "heading": "Select events",
+    "heading": "Select event(s)",
+    "searchPlaceholder": "Search events…",
+    "noResults": "No events match your search.",
+    "bulkActionsAria": "Bulk event selection",
     "selectAll": "Select all",
     "clearAll": "Clear all"
   },
@@ -60,7 +65,7 @@
     }
   },
   "results": {
-    "heading": "Results",
+    "heading": "Converted times",
     "editTimes": "Edit times",
     "exportExcel": "Export to Excel",
     "caption": "Converted event times across SCY, SCM, and LCM.",

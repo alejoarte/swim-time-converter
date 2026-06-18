@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import type { Course } from '../lib/convert'
+import { IconChevronDown, IconInfo, IconSwimmer } from './icons'
 
 type CourseSelectorProps = {
   value: Course
@@ -7,6 +8,7 @@ type CourseSelectorProps = {
   disabled?: boolean
   heading?: string
   name?: string
+  showSourceHint?: boolean
 }
 
 const COURSES: { value: Course; descKey: 'scyDesc' | 'scmDesc' | 'lcmDesc' }[] = [
@@ -21,29 +23,41 @@ export function CourseSelector({
   disabled,
   heading,
   name = 'source-course',
+  showSourceHint = true,
 }: CourseSelectorProps) {
   const { t } = useTranslation()
   const headingText = heading ?? t('course.headingDefault')
 
   return (
     <section className="course-selector">
-      <h2>{headingText}</h2>
-      <div className="course-options" role="radiogroup" aria-label={headingText}>
-        {COURSES.map((course) => (
-          <label key={course.value} className="course-option">
-            <input
-              type="radio"
-              name={name}
-              value={course.value}
-              checked={value === course.value}
-              onChange={() => onChange(course.value)}
-              disabled={disabled}
-            />
-            <span className="course-label">{course.value}</span>
-            <span className="course-desc">{t(`course.${course.descKey}`)}</span>
-          </label>
-        ))}
+      <label className="field-label" htmlFor={name}>
+        {headingText}
+      </label>
+      <div className="course-select-wrap">
+        <IconSwimmer className="course-select-icon" size={20} />
+        <select
+          id={name}
+          name={name}
+          className="course-select"
+          value={value}
+          onChange={(e) => onChange(e.target.value as Course)}
+          disabled={disabled}
+          aria-label={t('course.selectAria')}
+        >
+          {COURSES.map((course) => (
+            <option key={course.value} value={course.value}>
+              {course.value} – {t(`course.${course.descKey}`)}
+            </option>
+          ))}
+        </select>
+        <IconChevronDown className="course-select-chevron" size={18} />
       </div>
+      {showSourceHint && (
+        <p className="hint-inline">
+          <IconInfo size={14} />
+          <span>{t('course.sourceHint')}</span>
+        </p>
+      )}
     </section>
   )
 }

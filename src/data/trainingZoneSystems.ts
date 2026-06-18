@@ -182,7 +182,10 @@ export function getLocalizedZoneName(
   return `${getZoneName('aSystem', level)} · ${getZoneName('usSystem', level)}`
 }
 
-export function getLocalizedZoneCode(systemId: ZoneSystemId, level: IntensityLevel): string {
+export function getLocalizedZoneCode(
+  systemId: ZoneSystemId,
+  level: IntensityLevel,
+): string {
   const a = A_SYSTEM_CODES.find((z) => z.level === level)!
   const us = US_SYSTEM_CODES.find((z) => z.level === level)!
   if (systemId === 'a-system') return a.code

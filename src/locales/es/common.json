@@ -28,14 +28,19 @@
   "disclaimer": "Las conversiones usan factores clásicos (Colorado Timing). Los ritmos de zona son estimaciones según tus datos. Nada de esto es oficial ni sustituye la orientación de tu entrenador.",
   "exportError": "No se pudieron exportar los resultados.",
   "course": {
-    "headingDefault": "Mis tiempos están en",
+    "headingDefault": "Seleccionar piscina",
     "headingPlan": "Piscina",
     "scyDesc": "Piscina corta en yardas",
     "scmDesc": "Piscina corta en metros",
-    "lcmDesc": "Piscina larga en metros"
+    "lcmDesc": "Piscina larga en metros",
+    "sourceHint": "* Piscina de origen",
+    "selectAria": "Seleccionar piscina de origen"
   },
   "eventPicker": {
-    "heading": "Seleccionar pruebas",
+    "heading": "Seleccionar prueba(s)",
+    "searchPlaceholder": "Buscar pruebas…",
+    "noResults": "Ninguna prueba coincide con la búsqueda.",
+    "bulkActionsAria": "Selección masiva de pruebas",
     "selectAll": "Seleccionar todo",
     "clearAll": "Borrar todo"
   },
@@ -60,7 +65,7 @@
     }
   },
   "results": {
-    "heading": "Resultados",
+    "heading": "Tiempos convertidos",
     "editTimes": "Editar tiempos",
     "exportExcel": "Exportar a Excel",
     "caption": "Tiempos convertidos en SCY, SCM y LCM.",

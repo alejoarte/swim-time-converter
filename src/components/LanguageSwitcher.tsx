@@ -17,11 +17,7 @@ export function LanguageSwitcher() {
   }
 
   return (
-    <div
-      className="language-switch"
-      role="group"
-      aria-label={t('language.label')}
-    >
+    <div className="language-switch" role="group" aria-label={t('language.label')}>
       <button
         type="button"
         className={

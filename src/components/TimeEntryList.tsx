@@ -32,8 +32,8 @@ export function TimeEntryList({
 
   if (selectedIds.length === 0) {
     return (
-      <section className="time-entry">
-        <h2>{t('timeEntry.heading', { course: sourceCourse })}</h2>
+      <section className="card time-entry">
+        <h2 className="card-title">{t('timeEntry.heading', { course: sourceCourse })}</h2>
         <p className="hint">{t('timeEntry.emptyHint')}</p>
       </section>
     )
@@ -42,8 +42,8 @@ export function TimeEntryList({
   const sortedIds = [...selectedIds].sort(compareEventIds)
 
   return (
-    <section className="time-entry">
-      <h2>{t('timeEntry.heading', { course: sourceCourse })}</h2>
+    <section className="card time-entry">
+      <h2 className="card-title">{t('timeEntry.heading', { course: sourceCourse })}</h2>
       <ul className="time-entry-list">
         {sortedIds.map((id) => {
           const event = getEventById(id)

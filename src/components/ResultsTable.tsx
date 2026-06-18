@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { getEventLabel } from '../data/events'
 import type { ConversionResult, Course } from '../lib/convert'
 import { formatTime } from '../lib/timeParse'
+import { IconInfo } from './icons'
 
 type ResultsTableProps = {
   results: ConversionResult[]
@@ -16,10 +17,12 @@ export function ResultsTable({ results, onEditTimes, onExport }: ResultsTablePro
 
   if (results.length === 0) return null
 
+  const sourceCourse = results[0]?.sourceCourse
+
   return (
-    <section className="results">
+    <section className="card results">
       <div className="section-header">
-        <h2>{t('results.heading')}</h2>
+        <h2 className="card-title">{t('results.heading')}</h2>
         <div className="button-group">
           <button type="button" className="secondary" onClick={onEditTimes}>
             {t('results.editTimes')}
@@ -31,13 +34,20 @@ export function ResultsTable({ results, onEditTimes, onExport }: ResultsTablePro
       </div>
 
       <div className="table-wrapper">
-        <table>
+        <table className="results-table">
           <caption className="visually-hidden">{t('results.caption')}</caption>
           <thead>
             <tr>
               <th>{t('results.eventColumn')}</th>
               {COURSES.map((course) => (
-                <th key={course}>{course}</th>
+                <th key={course} className={course === sourceCourse ? 'source-col-header' : undefined}>
+                  {course}
+                  {course === sourceCourse && (
+                    <span className="source-marker" title={t('results.sourceMarkerTitle')}>
+                      *
+                    </span>
+                  )}
+                </th>
               ))}
             </tr>
           </thead>
@@ -48,14 +58,11 @@ export function ResultsTable({ results, onEditTimes, onExport }: ResultsTablePro
                 {COURSES.map((course) => (
                   <td
                     key={course}
-                    className={course === row.sourceCourse ? 'source-cell' : undefined}
+                    className={
+                      course === row.sourceCourse ? 'source-cell source-cell--value' : undefined
+                    }
                   >
                     {formatTime(row[course])}
-                    {course === row.sourceCourse && (
-                      <span className="source-marker" title={t('results.sourceMarkerTitle')}>
-                        *
-                      </span>
-                    )}
                   </td>
                 ))}
               </tr>
@@ -63,7 +70,10 @@ export function ResultsTable({ results, onEditTimes, onExport }: ResultsTablePro
           </tbody>
         </table>
       </div>
-      <p className="hint">{t('results.sourceHint')}</p>
+      <p className="hint-inline hint-inline--below">
+        <IconInfo size={14} />
+        <span>{t('results.sourceHint')}</span>
+      </p>
     </section>
   )
 }

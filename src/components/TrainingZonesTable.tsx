@@ -74,7 +74,11 @@ export function TrainingZonesTable({
           />
         </p>
         <p>
-          <Trans ns="zones" i18nKey="table.callout2" components={{ strong: <strong /> }} />
+          <Trans
+            ns="zones"
+            i18nKey="table.callout2"
+            components={{ strong: <strong /> }}
+          />
         </p>
       </div>
 

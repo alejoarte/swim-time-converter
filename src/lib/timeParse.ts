@@ -102,11 +102,7 @@ function parsePart(value: string, max: number): number | null {
 }
 
 export function isTimePartsEmpty(parts: TimeParts): boolean {
-  return (
-    !parts.minutes.trim() &&
-    !parts.seconds.trim() &&
-    !parts.hundredths.trim()
-  )
+  return !parts.minutes.trim() && !parts.seconds.trim() && !parts.hundredths.trim()
 }
 
 export function partsToCentiseconds(parts: TimeParts): number | null {
