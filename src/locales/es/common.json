@@ -23,7 +23,7 @@
   },
   "generate": {
     "button": "Generar conversiones",
-    "hint": "Introduce un tiempo válido para cada prueba seleccionada."
+    "hint": "Introduce un tiempo válido para cada prueba seleccionada para ver conversiones en vivo."
   },
   "loadingPlan": "Cargando plan de entrenamiento…",
   "disclaimer": "Las conversiones usan factores clásicos (Colorado Timing). Los ritmos de zona son estimaciones según tus datos. Nada de esto es oficial ni sustituye la orientación de tu entrenador.",
@@ -51,7 +51,8 @@
   },
   "timeEntry": {
     "heading": "Introducir tiempos {{course}}",
-    "emptyHint": "Selecciona al menos una prueba arriba para introducir tiempos."
+    "emptyHint": "Selecciona al menos una prueba arriba para introducir tiempos.",
+    "pasteHint": "Pega un tiempo de competición como 1:02.34 en cualquier campo para rellenar los tres."
   },
   "timeFields": {
     "ariaLabel": "Tiempo de nado",
@@ -67,20 +68,28 @@
   },
   "results": {
     "heading": "Tiempos convertidos",
-    "editTimes": "Editar tiempos",
     "exportExcel": "Exportar a Excel",
     "caption": "Tiempos convertidos en SCY, SCM y LCM.",
     "eventColumn": "Prueba",
     "sourceMarkerTitle": "Tiempo introducido",
-    "sourceHint": "* = tu tiempo introducido"
+    "sourceHint": "* = tu tiempo introducido",
+    "livePreview": "Las conversiones se actualizan en vivo al introducir tiempos válidos."
+  },
+  "confirm": {
+    "courseChange": "Cambiar la piscina de origen recalculará todas las conversiones. ¿Continuar?",
+    "selectionChange": "Quitar pruebas con tiempos introducidos descartará esos tiempos. ¿Continuar?"
   },
   "share": {
     "copyLink": "Copiar enlace",
     "copyLinkAria": "Copiar enlace para compartir este plan de entrenamiento",
+    "copyConversionLink": "Copiar enlace",
+    "copyConversionLinkAria": "Copiar enlace para compartir estas conversiones",
     "copied": "Enlace copiado",
     "copyFailed": "No se pudo copiar. Selecciona y copia este enlace:",
     "loadedBanner": "Plan de entrenamiento compartido cargado.",
     "invalidBanner": "Este enlace está incompleto o no es válido. Introduce un tiempo objetivo abajo.",
+    "conversionLoadedBanner": "Lote de conversiones compartido cargado.",
+    "conversionInvalidBanner": "Este enlace de conversión está incompleto o no es válido. Introduce tiempos abajo.",
     "hint": "Cualquiera con este enlace puede ver tu tiempo objetivo y ritmos de entrenamiento."
   },
   "plan": {

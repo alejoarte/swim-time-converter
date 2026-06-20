@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx'
+import type { WorkBook, WorkSheet } from 'xlsx'
 import { compareEventIds } from '../data/events'
 import { getOffsetModelLabel, getZoneGlossary } from '../data/trainingZoneSystems'
 import i18n from '../i18n'
@@ -12,11 +12,61 @@ import {
 
 const COURSES: Course[] = ['SCY', 'SCM', 'LCM']
 
-function writeWorkbookFile(workbook: XLSX.WorkBook, fileName: string): void {
+type XlsxModule = typeof import('xlsx')
+
+async function loadXlsx(): Promise<XlsxModule> {
+  return import('xlsx')
+}
+
+function uniqueExportStamp(): string {
+  const now = new Date()
+  const date = now.toISOString().slice(0, 10)
+  const time = now.toTimeString().slice(0, 8).replace(/:/g, '')
+  return `${date}-${time}`
+}
+
+function writeWorkbookFile(XLSX: XlsxModule, workbook: WorkBook, fileName: string): void {
   try {
     XLSX.writeFile(workbook, fileName)
   } catch {
     throw new Error(i18n.t('error', { ns: 'export' }))
+  }
+}
+
+function courseHeaderLabel(course: Course, sourceCourse: Course): string {
+  return course === sourceCourse ? `${course} *` : course
+}
+
+function applyConversionSheetLayout(
+  worksheet: WorkSheet,
+  sourceCourse: Course,
+  headerRowIndex: number,
+): void {
+  worksheet['!cols'] = [
+    { wch: 22 },
+    { wch: 12 },
+    { wch: 12 },
+    { wch: 12 },
+    { wch: 12 },
+  ]
+  worksheet['!freeze'] = {
+    xSplit: 0,
+    ySplit: headerRowIndex + 1,
+    topLeftCell: `A${headerRowIndex + 2}`,
+    activePane: 'bottomLeft',
+    state: 'frozen',
+  }
+
+  const sourceColIndex = COURSES.indexOf(sourceCourse)
+  if (sourceColIndex >= 0) {
+    const colLetter = String.fromCharCode('A'.charCodeAt(0) + 2 + sourceColIndex)
+    const headerCell = worksheet[`${colLetter}${headerRowIndex + 1}`]
+    if (headerCell) {
+      headerCell.s = {
+        fill: { patternType: 'solid', fgColor: { rgb: 'FFF3CD' } },
+        font: { bold: true },
+      }
+    }
   }
 }
 
@@ -30,7 +80,10 @@ export type TrainingZoneExportParams = {
   showRaceAverageReference: boolean
 }
 
-export function exportTrainingZonesToExcel(params: TrainingZoneExportParams): void {
+export async function exportTrainingZonesToExcel(
+  params: TrainingZoneExportParams,
+): Promise<void> {
+  const XLSX = await loadXlsx()
   const {
     eventLabel,
     course,
@@ -136,15 +189,22 @@ export function exportTrainingZonesToExcel(params: TrainingZoneExportParams): vo
     i18n.t('trainingZones.sheetName', { ns: 'export' }),
   )
 
-  const dateStamp = new Date().toISOString().slice(0, 10)
   const slug = eventLabel
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
-  writeWorkbookFile(workbook, `swim-training-zones-${slug || 'plan'}-${dateStamp}.xlsx`)
+  writeWorkbookFile(
+    XLSX,
+    workbook,
+    `swim-training-zones-${slug || 'plan'}-${uniqueExportStamp()}.xlsx`,
+  )
 }
 
-export function exportToExcel(results: ConversionResult[], sourceCourse: Course): void {
+export async function exportToExcel(
+  results: ConversionResult[],
+  sourceCourse: Course,
+): Promise<void> {
+  const XLSX = await loadXlsx()
   const generatedAt = new Date().toLocaleString(i18n.language)
   const headerRows: (string | number)[][] = [
     [i18n.t('conversions.title', { ns: 'export' })],
@@ -154,34 +214,22 @@ export function exportToExcel(results: ConversionResult[], sourceCourse: Course)
     [],
     [
       i18n.t('conversions.columns.event', { ns: 'export' }),
-      i18n.t('conversions.columns.sourceCourse', { ns: 'export' }),
       i18n.t('conversions.columns.sourceTime', { ns: 'export' }),
-      'SCY',
-      'SCM',
-      'LCM',
+      ...COURSES.map((course) => courseHeaderLabel(course, sourceCourse)),
     ],
   ]
 
+  const headerRowIndex = headerRows.length - 1
   const sortedResults = [...results].sort((a, b) => compareEventIds(a.eventId, b.eventId))
 
   const dataRows = sortedResults.map((row) => [
     row.eventLabel,
-    row.sourceCourse,
     formatTime(row.sourceCentiseconds),
-    formatTime(row.SCY),
-    formatTime(row.SCM),
-    formatTime(row.LCM),
+    ...COURSES.map((course) => formatTime(row[course])),
   ])
 
   const worksheet = XLSX.utils.aoa_to_sheet([...headerRows, ...dataRows])
-  worksheet['!cols'] = [
-    { wch: 18 },
-    { wch: 14 },
-    { wch: 12 },
-    { wch: 12 },
-    { wch: 12 },
-    { wch: 12 },
-  ]
+  applyConversionSheetLayout(worksheet, sourceCourse, headerRowIndex)
 
   const workbook = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(
@@ -190,8 +238,7 @@ export function exportToExcel(results: ConversionResult[], sourceCourse: Course)
     i18n.t('conversions.sheetName', { ns: 'export' }),
   )
 
-  const dateStamp = new Date().toISOString().slice(0, 10)
-  writeWorkbookFile(workbook, `swim-conversions-${dateStamp}.xlsx`)
+  writeWorkbookFile(XLSX, workbook, `swim-conversions-${uniqueExportStamp()}.xlsx`)
 }
 
 export { COURSES }

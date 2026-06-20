@@ -2,17 +2,23 @@ import { useTranslation } from 'react-i18next'
 import { getEventLabel } from '../data/events'
 import type { ConversionResult, Course } from '../lib/convert'
 import { formatTime } from '../lib/timeParse'
-import { IconInfo } from './icons'
+import { IconInfo, IconLink } from './icons'
 
 type ResultsTableProps = {
   results: ConversionResult[]
-  onEditTimes: () => void
   onExport: () => void
+  onCopyLink: () => void
+  copyStatus: 'idle' | 'copied' | 'failed'
 }
 
 const COURSES: Course[] = ['SCY', 'SCM', 'LCM']
 
-export function ResultsTable({ results, onEditTimes, onExport }: ResultsTableProps) {
+export function ResultsTable({
+  results,
+  onExport,
+  onCopyLink,
+  copyStatus,
+}: ResultsTableProps) {
   const { t } = useTranslation()
 
   if (results.length === 0) return null
@@ -24,8 +30,16 @@ export function ResultsTable({ results, onEditTimes, onExport }: ResultsTablePro
       <div className="section-header">
         <h2 className="card-title">{t('results.heading')}</h2>
         <div className="button-group">
-          <button type="button" className="secondary" onClick={onEditTimes}>
-            {t('results.editTimes')}
+          <button
+            type="button"
+            className="secondary icon-btn"
+            onClick={onCopyLink}
+            aria-label={t('share.copyConversionLinkAria')}
+          >
+            <IconLink size={16} />
+            <span>
+              {copyStatus === 'copied' ? t('share.copied') : t('share.copyConversionLink')}
+            </span>
           </button>
           <button type="button" onClick={onExport}>
             {t('results.exportExcel')}

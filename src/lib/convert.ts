@@ -22,7 +22,7 @@ function isDistanceFreeEvent(event: SwimEvent): boolean {
   return event.distance === 500 || event.distance === 1000 || event.distance === 1650
 }
 
-function isScyLcmDistancePair(event: SwimEvent): boolean {
+function usesDistanceFreeFactor(event: SwimEvent): boolean {
   return isDistanceFreeEvent(event)
 }
 
@@ -31,7 +31,7 @@ export function getFFactor(from: Course, to: Course, event: SwimEvent): number {
   if (from === 'SCM' && to === 'LCM') return 1.0
   if (from === 'LCM' && to === 'SCM') return 1.0
 
-  if (isScyLcmDistancePair(event)) {
+  if (usesDistanceFreeFactor(event)) {
     if (event.distance === 500 || event.distance === 1000) {
       return CLASSICAL_FACTOR_DISTANCE_FREE
     }
@@ -99,23 +99,23 @@ function convertDirect(
   const fFactor = getFFactor(from, to, event)
   const fIncre = getFIncre(from, to, event)
 
+  let converted: number
+
   if (from === 'SCY' && (to === 'LCM' || to === 'SCM')) {
-    return hsecs * fFactor + fIncre
-  }
-  if (from === 'LCM' && (to === 'SCY' || to === 'SCM')) {
-    return (hsecs - fIncre) / fFactor
-  }
-  if (from === 'SCM' && to === 'SCY') {
-    return hsecs / fFactor
-  }
-  if (from === 'SCM' && to === 'LCM') {
-    return hsecs + fIncre
-  }
-  if (from === 'LCM' && to === 'SCM') {
-    return (hsecs - fIncre) / fFactor
+    converted = hsecs * fFactor + fIncre
+  } else if (from === 'LCM' && (to === 'SCY' || to === 'SCM')) {
+    converted = (hsecs - fIncre) / fFactor
+  } else if (from === 'SCM' && to === 'SCY') {
+    converted = hsecs / fFactor
+  } else if (from === 'SCM' && to === 'LCM') {
+    converted = hsecs + fIncre
+  } else if (from === 'LCM' && to === 'SCM') {
+    converted = (hsecs - fIncre) / fFactor
+  } else {
+    throw new Error(`Unsupported direct conversion: ${from} → ${to}`)
   }
 
-  throw new Error(`Unsupported direct conversion: ${from} → ${to}`)
+  return Math.max(0, converted)
 }
 
 /** Convert time in centiseconds between courses using Classical (Colorado Timing) factors. */
@@ -142,8 +142,7 @@ export function convertCentiseconds(
     }
   }
 
-  const viaLcm = convertCentiseconds(hsecs, from, 'LCM', event)
-  return convertCentiseconds(viaLcm, 'LCM', to, event)
+  throw new Error(`Unsupported conversion: ${from} → ${to}`)
 }
 
 export type ConversionResult = {

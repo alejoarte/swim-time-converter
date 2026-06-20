@@ -619,6 +619,21 @@ body {
   border: 1px solid #ffe082;
 }
 
+.live-preview-banner {
+  margin: 0 0 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #bbdefb;
+}
+
+.time-entry-paste-hint {
+  margin-top: -0.25rem;
+  margin-bottom: 0.75rem;
+}
+
 .share-hint {
   margin: 0 0 0.75rem;
 }

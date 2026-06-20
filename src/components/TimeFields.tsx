@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import {
   getTimePartsError,
   normalizeTimeParts,
+  rawTimeToTimeParts,
   type TimePart,
   type TimeParts,
 } from '../lib/timeParse'
@@ -11,6 +12,7 @@ type TimeFieldsProps = {
   idPrefix: string
   value: TimeParts
   onChange: (part: TimePart, value: string) => void
+  onPaste: (parts: TimeParts) => void
   onNormalize: (parts: TimeParts) => void
   disabled?: boolean
   showErrors?: boolean
@@ -24,6 +26,7 @@ export function TimeFields({
   idPrefix,
   value,
   onChange,
+  onPaste,
   onNormalize,
   disabled,
   showErrors,
@@ -35,6 +38,7 @@ export function TimeFields({
   latestPartsRef.current = value
 
   const error = showErrors ? getTimePartsError(value) : null
+  const errorId = error ? `${idPrefix}-error` : undefined
   const errorMessage = error ? t(`timeFields.errors.${error}`) : null
 
   const handleChange = (part: TimePart, raw: string, maxLength: number) => {
@@ -58,6 +62,17 @@ export function TimeFields({
     onNormalize(normalizeTimeParts(latestPartsRef.current))
   }
 
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const text = e.clipboardData.getData('text')
+    const parts = rawTimeToTimeParts(text)
+    if (!parts) return
+
+    e.preventDefault()
+    const normalized = normalizeTimeParts(parts)
+    latestPartsRef.current = normalized
+    onPaste(normalized)
+  }
+
   const invalidSeconds =
     showErrors &&
     value.seconds.trim() !== '' &&
@@ -77,6 +92,7 @@ export function TimeFields({
         role="group"
         aria-label={t('timeFields.ariaLabel')}
         aria-invalid={!!error}
+        aria-describedby={errorId}
       >
         <div className="time-field">
           <label className="time-field-label" htmlFor={`${idPrefix}-min`}>
@@ -92,9 +108,11 @@ export function TimeFields({
             value={value.minutes}
             onChange={(e) => handleChange('minutes', e.target.value, 3)}
             onBlur={handleFieldBlur}
+            onPaste={handlePaste}
             disabled={disabled}
             enterKeyHint="next"
             aria-invalid={invalidMinutes}
+            aria-describedby={errorId}
           />
         </div>
         <span className="time-sep" aria-hidden="true">
@@ -114,9 +132,11 @@ export function TimeFields({
             value={value.seconds}
             onChange={(e) => handleChange('seconds', e.target.value, 2)}
             onBlur={handleFieldBlur}
+            onPaste={handlePaste}
             disabled={disabled}
             enterKeyHint="next"
             aria-invalid={invalidSeconds}
+            aria-describedby={errorId}
           />
         </div>
         <span className="time-sep" aria-hidden="true">
@@ -137,13 +157,19 @@ export function TimeFields({
             value={value.hundredths}
             onChange={(e) => handleChange('hundredths', e.target.value, 2)}
             onBlur={handleFieldBlur}
+            onPaste={handlePaste}
             disabled={disabled}
             enterKeyHint="done"
             aria-invalid={invalidHundredths}
+            aria-describedby={errorId}
           />
         </div>
       </div>
-      {errorMessage && <span className="field-error">{errorMessage}</span>}
+      {errorMessage && (
+        <span className="field-error" id={errorId}>
+          {errorMessage}
+        </span>
+      )}
     </div>
   )
 }

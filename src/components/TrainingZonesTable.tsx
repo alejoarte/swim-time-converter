@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { getOffsetModelLabel, getZoneGlossary } from '../data/trainingZoneSystems'
+import { getEventById } from '../data/events'
 import { type Course } from '../lib/convert'
 import {
   buildSimplifiedZoneRows,
@@ -26,6 +27,7 @@ import {
 } from './icons'
 
 export type TrainingZonesTableContext = {
+  eventId: string
   eventLabel: string
   course: string
   zoneSystemLabel: string
@@ -88,7 +90,9 @@ export function TrainingZonesTable({
   const unitLabel = lengthUnit === 'yard' ? 'y' : 'm'
   const unitShort = lengthUnit === 'yard' ? 'y' : 'm'
   const offsetModelLabel = getOffsetModelLabel(plan.offsetModel)
-  const simplifiedRows = buildSimplifiedZoneRows(plan, course)
+  const event = getEventById(context.eventId)
+  const simplifiedRows =
+    event !== undefined ? buildSimplifiedZoneRows(plan, course, event) : []
 
   return (
     <section className="plan-card training-zones">

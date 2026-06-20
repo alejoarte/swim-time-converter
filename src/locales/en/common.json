@@ -23,7 +23,7 @@
   },
   "generate": {
     "button": "Generate conversions",
-    "hint": "Enter a valid time for each selected event."
+    "hint": "Enter a valid time for each selected event to see live conversions."
   },
   "loadingPlan": "Loading plan training…",
   "disclaimer": "Converted times use Classical (Colorado Timing) factors. Training zone paces are estimated from your inputs. Nothing here is official or a substitute for your coach's guidance.",
@@ -51,7 +51,8 @@
   },
   "timeEntry": {
     "heading": "Enter {{course}} times",
-    "emptyHint": "Select at least one event above to enter times."
+    "emptyHint": "Select at least one event above to enter times.",
+    "pasteHint": "Paste a meet time like 1:02.34 into any field to fill all three."
   },
   "timeFields": {
     "ariaLabel": "Swim time",
@@ -67,20 +68,28 @@
   },
   "results": {
     "heading": "Converted times",
-    "editTimes": "Edit times",
     "exportExcel": "Export to Excel",
     "caption": "Converted event times across SCY, SCM, and LCM.",
     "eventColumn": "Event",
     "sourceMarkerTitle": "Source time",
-    "sourceHint": "* = your entered time"
+    "sourceHint": "* = your entered time",
+    "livePreview": "Conversions update live as you enter valid times."
+  },
+  "confirm": {
+    "courseChange": "Changing the source course will recalculate all conversions. Continue?",
+    "selectionChange": "Removing events with entered times will discard those times. Continue?"
   },
   "share": {
     "copyLink": "Copy link",
     "copyLinkAria": "Copy shareable link to this training plan",
+    "copyConversionLink": "Copy link",
+    "copyConversionLinkAria": "Copy shareable link to these conversions",
     "copied": "Link copied",
     "copyFailed": "Could not copy. Select and copy this link:",
     "loadedBanner": "Shared training plan loaded.",
     "invalidBanner": "This link is incomplete or invalid. Enter a goal time below.",
+    "conversionLoadedBanner": "Shared conversion batch loaded.",
+    "conversionInvalidBanner": "This conversion link is incomplete or invalid. Enter times below.",
     "hint": "Anyone with this link can see your goal time and training paces."
   },
   "plan": {

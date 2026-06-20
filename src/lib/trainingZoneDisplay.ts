@@ -1,4 +1,4 @@
-import { getEventById } from '../data/events'
+import { type SwimEvent } from '../data/events'
 import { getIntensitySpec, type IntensityLevel } from '../data/trainingZoneSystems'
 import i18n from '../i18n'
 import { convertCentiseconds, type Course } from './convert'
@@ -50,16 +50,15 @@ export function formatPaceRange(minCs: number, maxCs: number): string {
   return `${formatTime(minCs)} – ${formatTime(maxCs)}`
 }
 
-function getMetricPace(cs: number, course: Course): number | null {
+function getMetricPace(cs: number, course: Course, event: SwimEvent): number | null {
   if (course !== 'SCY') return null
-  const ref = getEventById('100-free')
-  if (!ref) return null
-  return Math.round(convertCentiseconds(cs, 'SCY', 'SCM', ref))
+  return Math.round(convertCentiseconds(cs, 'SCY', 'SCM', event))
 }
 
 export function buildSimplifiedZoneRows(
   plan: TrainingZonePlan,
   course: Course,
+  event: SwimEvent,
 ): SimplifiedZoneRow[] {
   const repDistance = plan.practiceRepDistance
   const rowsByLevel = new Map(plan.rows.map((row) => [row.level, row]))
@@ -87,8 +86,8 @@ export function buildSimplifiedZoneRows(
       rpeLabel: i18n.t(`simplified.${group.id}.rpe`, { ns: 'zones' }),
       paceMinCs,
       paceMaxCs,
-      metricPaceMinCs: getMetricPace(paceMinCs, course),
-      metricPaceMaxCs: getMetricPace(paceMaxCs, course),
+      metricPaceMinCs: getMetricPace(paceMinCs, course, event),
+      metricPaceMaxCs: getMetricPace(paceMaxCs, course, event),
     }
   })
 }

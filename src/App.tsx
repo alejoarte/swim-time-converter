@@ -1,22 +1,28 @@
-import { Suspense, lazy, useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CourseSelector } from './components/CourseSelector'
 import { EventPicker } from './components/EventPicker'
 import { IconSwimmer } from './components/icons'
 import { LanguageSwitcher } from './components/LanguageSwitcher'
 import { ResultsTable } from './components/ResultsTable'
-import { canGenerate, TimeEntryList } from './components/TimeEntryList'
+import { TimeEntryList } from './components/TimeEntryList'
 import { compareEventIds, getEventById } from './data/events'
-import { convertEntry, type ConversionResult, type Course } from './lib/convert'
-import { exportToExcel } from './lib/exportExcel'
+import { buildConversionResults, hasAnyTimeEntry } from './lib/conversionResults'
+import { type Course } from './lib/convert'
 import {
+  buildManualShareUrl,
+  hasManualShareQuery,
   hasPlanShareQuery,
+  parseManualShareFromLocation,
   parsePlanShareFromLocation,
+  type ManualShareState,
   type PlanShareState,
 } from './lib/shareUrl'
 import {
+  centisecondsToTimeParts,
   EMPTY_TIME_PARTS,
-  partsToCentiseconds,
+  isTimePartsEmpty,
+  isValidTimeParts,
   type TimePart,
   type TimeParts,
 } from './lib/timeParse'
@@ -48,29 +54,84 @@ function isTimeParts(value: unknown): value is TimeParts {
 type InitialShareBootstrap = {
   mode: AppMode
   planShareInitial: PlanShareState | null
+  manualShareInitial: ManualShareState | null
   shareParseFailed: boolean
+}
+
+function manualShareToSavedState(share: ManualShareState): SavedManualState {
+  const times: Record<string, TimeParts> = {}
+  for (const entry of share.entries) {
+    times[entry.eventId] = centisecondsToTimeParts(entry.centiseconds)
+  }
+
+  return {
+    sourceCourse: share.sourceCourse,
+    selectedIds: share.entries.map((entry) => entry.eventId).sort(compareEventIds),
+    times,
+  }
 }
 
 function getInitialShareBootstrap(): InitialShareBootstrap {
   if (typeof window === 'undefined') {
-    return { mode: 'manual', planShareInitial: null, shareParseFailed: false }
+    return {
+      mode: 'manual',
+      planShareInitial: null,
+      manualShareInitial: null,
+      shareParseFailed: false,
+    }
   }
 
   const params = new URLSearchParams(window.location.search)
   const planShareInitial = parsePlanShareFromLocation()
 
   if (planShareInitial) {
-    return { mode: 'plan', planShareInitial, shareParseFailed: false }
+    return {
+      mode: 'plan',
+      planShareInitial,
+      manualShareInitial: null,
+      shareParseFailed: false,
+    }
   }
 
   if (hasPlanShareQuery(params)) {
-    return { mode: 'plan', planShareInitial: null, shareParseFailed: true }
+    return {
+      mode: 'plan',
+      planShareInitial: null,
+      manualShareInitial: null,
+      shareParseFailed: true,
+    }
   }
 
-  return { mode: 'manual', planShareInitial: null, shareParseFailed: false }
+  const manualShareInitial = parseManualShareFromLocation()
+  if (manualShareInitial) {
+    return {
+      mode: 'manual',
+      planShareInitial: null,
+      manualShareInitial,
+      shareParseFailed: false,
+    }
+  }
+
+  if (hasManualShareQuery(params)) {
+    return {
+      mode: 'manual',
+      planShareInitial: null,
+      manualShareInitial: null,
+      shareParseFailed: true,
+    }
+  }
+
+  return {
+    mode: 'manual',
+    planShareInitial: null,
+    manualShareInitial: null,
+    shareParseFailed: false,
+  }
 }
 
-function loadSavedManualState(): SavedManualState | null {
+function loadSavedManualState(manualShare: ManualShareState | null): SavedManualState | null {
+  if (manualShare) return manualShareToSavedState(manualShare)
+
   if (typeof window === 'undefined') return null
 
   try {
@@ -84,13 +145,17 @@ function loadSavedManualState(): SavedManualState | null {
     if (!Array.isArray(draft.selectedIds)) return null
     if (!draft.times || typeof draft.times !== 'object') return null
 
+    const validEventIds = new Set(
+      draft.selectedIds.filter((id) => typeof id === 'string' && getEventById(id)),
+    )
+
     const validTimesEntries = Object.entries(draft.times).filter(
-      ([eventId, parts]) => typeof eventId === 'string' && isTimeParts(parts),
+      ([eventId, parts]) => validEventIds.has(eventId) && isTimeParts(parts),
     ) as [string, TimeParts][]
 
     return {
       sourceCourse: draft.sourceCourse,
-      selectedIds: draft.selectedIds.filter((id): id is string => typeof id === 'string'),
+      selectedIds: [...validEventIds].sort(compareEventIds),
       times: Object.fromEntries(validTimesEntries),
     }
   } catch {
@@ -103,10 +168,10 @@ const PlanTraining = lazy(() =>
 )
 
 function App() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [shareBootstrap] = useState(getInitialShareBootstrap)
   const [savedManualState] = useState<SavedManualState | null>(() =>
-    loadSavedManualState(),
+    loadSavedManualState(shareBootstrap.manualShareInitial),
   )
   const entryRef = useRef<HTMLDivElement>(null)
   const [mode, setMode] = useState<AppMode>(shareBootstrap.mode)
@@ -119,10 +184,25 @@ function App() {
   const [times, setTimes] = useState<Record<string, TimeParts>>(
     savedManualState?.times ?? {},
   )
-  const [showErrors, setShowErrors] = useState(false)
-  const [results, setResults] = useState<ConversionResult[] | null>(null)
-  const [locked, setLocked] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'failed'>('idle')
+  const [copyFallbackUrl, setCopyFallbackUrl] = useState<string | null>(null)
+  const copyStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const shareLanguageAppliedRef = useRef(false)
+
+  useEffect(() => {
+    const language =
+      shareBootstrap.manualShareInitial?.language ?? shareBootstrap.planShareInitial?.language
+    if (!language || shareLanguageAppliedRef.current) return
+    shareLanguageAppliedRef.current = true
+    void i18n.changeLanguage(language)
+  }, [shareBootstrap.manualShareInitial?.language, shareBootstrap.planShareInitial?.language, i18n])
+
+  useEffect(() => {
+    return () => {
+      if (copyStatusTimerRef.current) clearTimeout(copyStatusTimerRef.current)
+    }
+  }, [])
 
   useEffect(() => {
     try {
@@ -137,8 +217,21 @@ function App() {
     }
   }, [sourceCourse, selectedIds, times])
 
-  const selectedList = [...selectedIds]
-  const ready = canGenerate(selectedList, times)
+  const selectedList = useMemo(() => [...selectedIds], [selectedIds])
+  const results = useMemo(
+    () => buildConversionResults(selectedList, times, sourceCourse),
+    [selectedList, times, sourceCourse],
+  )
+
+  const showTimeErrors =
+    selectedList.length > 0 &&
+    selectedList.some((id) => {
+      const parts = times[id] ?? EMPTY_TIME_PARTS
+      return !isTimePartsEmpty(parts) && !isValidTimeParts(parts)
+    })
+
+  const hasEnteredTimes = hasAnyTimeEntry(selectedList, times)
+
   const announcement = results
     ? t('announcements.results', { count: results.length })
     : mode === 'plan'
@@ -153,11 +246,14 @@ function App() {
         [part]: value,
       },
     }))
-    if (results) {
-      setResults(null)
-      setLocked(false)
-    }
     setExportError(null)
+    setCopyStatus('idle')
+  }
+
+  const handleTimePaste = (eventId: string, parts: TimeParts) => {
+    setTimes((prev) => ({ ...prev, [eventId]: parts }))
+    setExportError(null)
+    setCopyStatus('idle')
   }
 
   const handleTimeNormalize = (eventId: string, parts: TimeParts) => {
@@ -165,61 +261,68 @@ function App() {
   }
 
   const handleSelectedChange = (next: Set<string>) => {
-    setSelectedIds(next)
-    if (results) {
-      setResults(null)
-      setLocked(false)
+    const removedWithTimes = selectedList.some((id) => {
+      if (next.has(id)) return false
+      const parts = times[id] ?? EMPTY_TIME_PARTS
+      return !isTimePartsEmpty(parts)
+    })
+
+    if (removedWithTimes && !window.confirm(t('confirm.selectionChange'))) {
+      return
     }
+
+    setSelectedIds(next)
     setExportError(null)
+    setCopyStatus('idle')
   }
 
   const handleCourseChange = (course: Course) => {
-    setSourceCourse(course)
-    if (results) {
-      setResults(null)
-      setLocked(false)
+    if (course === sourceCourse) return
+
+    if (hasEnteredTimes && !window.confirm(t('confirm.courseChange'))) {
+      return
     }
+
+    setSourceCourse(course)
     setExportError(null)
+    setCopyStatus('idle')
   }
 
-  const handleGenerate = () => {
-    setShowErrors(true)
-    if (!ready) return
-
-    const converted: ConversionResult[] = selectedList
-      .map((id) => {
-        const event = getEventById(id)
-        const cs = partsToCentiseconds(times[id] ?? EMPTY_TIME_PARTS)
-        if (!event || cs === null) return null
-        return convertEntry(event, sourceCourse, cs)
-      })
-      .filter((r): r is ConversionResult => r !== null)
-      .sort((a, b) => compareEventIds(a.eventId, b.eventId))
-
-    setResults(converted)
-    setLocked(true)
-    setExportError(null)
-    setTimeout(() => {
-      document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' })
-    }, 100)
-  }
-
-  const handleEditTimes = () => {
-    setResults(null)
-    setLocked(false)
-    setShowErrors(false)
-    setExportError(null)
-    entryRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  const handleExport = () => {
+  const handleExport = async () => {
     if (!results) return
 
     setExportError(null)
     try {
-      exportToExcel(results, sourceCourse)
+      const { exportToExcel } = await import('./lib/exportExcel')
+      await exportToExcel(results, sourceCourse)
     } catch (error) {
       setExportError(error instanceof Error ? error.message : t('exportError'))
+    }
+  }
+
+  const handleCopyLink = async () => {
+    if (!results) return
+
+    const url = buildManualShareUrl({
+      sourceCourse,
+      entries: results.map((row) => ({
+        eventId: row.eventId,
+        centiseconds: row.sourceCentiseconds,
+      })),
+      language: i18n.language === 'es' ? 'es' : 'en',
+    })
+
+    setCopyFallbackUrl(null)
+    setCopyStatus('idle')
+
+    try {
+      await navigator.clipboard.writeText(url)
+      setCopyStatus('copied')
+      if (copyStatusTimerRef.current) clearTimeout(copyStatusTimerRef.current)
+      copyStatusTimerRef.current = setTimeout(() => setCopyStatus('idle'), 2500)
+    } catch {
+      setCopyStatus('failed')
+      setCopyFallbackUrl(url)
     }
   }
 
@@ -268,81 +371,95 @@ function App() {
       </header>
 
       <div className={`app${mode === 'plan' ? ' app--plan' : ''}`}>
-        <main id="main-content" ref={entryRef} className="app-main">
-          {mode === 'plan' ? (
-            <Suspense
-              fallback={
-                <p className="hint" role="status">
-                  {t('loadingPlan')}
-                </p>
-              }
-            >
-              <PlanTraining
-                initialFromShare={shareBootstrap.planShareInitial}
-                shareParseFailed={shareBootstrap.shareParseFailed}
-              />
-            </Suspense>
-          ) : (
-            <>
-              <div className="card card-grid-2 manual-input-card">
-                <CourseSelector
-                  value={sourceCourse}
-                  onChange={handleCourseChange}
-                  disabled={locked}
-                />
+      <main id="main-content" ref={entryRef} className="app-main">
+        {mode === 'plan' ? (
+          <Suspense
+            fallback={
+              <p className="hint" role="status">
+                {t('loadingPlan')}
+              </p>
+            }
+          >
+            <PlanTraining
+              initialFromShare={shareBootstrap.planShareInitial}
+              shareParseFailed={shareBootstrap.shareParseFailed}
+            />
+          </Suspense>
+        ) : (
+          <>
+            {shareBootstrap.manualShareInitial && (
+              <p className="share-banner share-banner--success" role="status">
+                {t('share.conversionLoadedBanner')}
+              </p>
+            )}
+            {shareBootstrap.shareParseFailed && mode === 'manual' && (
+              <p className="share-banner share-banner--warning" role="status">
+                {t('share.conversionInvalidBanner')}
+              </p>
+            )}
 
-                <EventPicker
-                  selectedIds={selectedIds}
-                  onChange={handleSelectedChange}
-                  disabled={locked}
-                />
-              </div>
+            <div className="card card-grid-2 manual-input-card">
+              <CourseSelector value={sourceCourse} onChange={handleCourseChange} />
 
-              <TimeEntryList
-                sourceCourse={sourceCourse}
-                selectedIds={selectedList}
-                times={times}
-                onTimeChange={handleTimeChange}
-                onTimeNormalize={handleTimeNormalize}
-                showErrors={showErrors}
-                disabled={locked}
-              />
+              <EventPicker selectedIds={selectedIds} onChange={handleSelectedChange} />
+            </div>
 
-              <div className="generate-section">
-                <button
-                  type="button"
-                  className="generate-btn"
-                  onClick={handleGenerate}
-                  disabled={locked || !ready}
-                >
-                  {t('generate.button')}
-                </button>
-                {!ready && selectedList.length > 0 && !locked && (
-                  <p className="hint">{t('generate.hint')}</p>
-                )}
-              </div>
+            <TimeEntryList
+              sourceCourse={sourceCourse}
+              selectedIds={selectedList}
+              times={times}
+              onTimeChange={handleTimeChange}
+              onTimePaste={handleTimePaste}
+              onTimeNormalize={handleTimeNormalize}
+              showErrors={showTimeErrors}
+            />
 
-              <div id="results">
-                {results && (
+            {selectedList.length > 0 && !results && (
+              <p className="hint generate-section">{t('generate.hint')}</p>
+            )}
+
+            <div id="results">
+              {results && (
+                <>
+                  <p className="live-preview-banner" role="status">
+                    {t('results.livePreview')}
+                  </p>
                   <ResultsTable
                     results={results}
-                    onEditTimes={handleEditTimes}
                     onExport={handleExport}
+                    onCopyLink={handleCopyLink}
+                    copyStatus={copyStatus}
                   />
-                )}
-                {exportError && (
-                  <p className="field-error" role="status" aria-live="polite">
-                    {exportError}
+                </>
+              )}
+              {copyStatus === 'failed' && copyFallbackUrl && (
+                <div className="share-copy-fallback">
+                  <p className="field-error" role="status">
+                    {t('share.copyFailed')}
                   </p>
-                )}
-              </div>
-            </>
-          )}
-        </main>
+                  <input
+                    className="share-copy-fallback-input"
+                    type="text"
+                    readOnly
+                    value={copyFallbackUrl}
+                    aria-label={t('share.copyConversionLinkAria')}
+                    onFocus={(e) => e.currentTarget.select()}
+                  />
+                </div>
+              )}
+              {exportError && (
+                <p className="field-error" role="status" aria-live="polite">
+                  {exportError}
+                </p>
+              )}
+            </div>
+          </>
+        )}
+      </main>
 
-        <footer className="app-disclaimer">
-          <p>{t('disclaimer')}</p>
-        </footer>
+      <footer className="app-disclaimer">
+        <p>{t('disclaimer')}</p>
+      </footer>
       </div>
     </>
   )

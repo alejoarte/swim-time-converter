@@ -57,7 +57,7 @@ describe('buildSimplifiedZoneRows', () => {
       'a-system',
       'fixed',
     )
-    const rows = buildSimplifiedZoneRows(plan, 'SCY')
+    const rows = buildSimplifiedZoneRows(plan, 'SCY', twoHundredFree)
 
     expect(rows).toHaveLength(4)
     expect(rows.map((row) => row.id)).toEqual([
@@ -80,9 +80,27 @@ describe('buildSimplifiedZoneRows', () => {
       'a-system',
       'fixed',
     )
-    const rows = buildSimplifiedZoneRows(plan, 'SCM')
+    const rows = buildSimplifiedZoneRows(plan, 'SCM', twoHundredFree)
 
     expect(rows[0].metricPaceMinCs).toBeNull()
     expect(rows[0].metricPaceMaxCs).toBeNull()
+  })
+
+  it('uses the selected event for SCY metric pace conversion', () => {
+    const goalCs = 15000
+    const twoHundredBreast = getEventById('200-breast')!
+    const hundredFree = getEventById('100-free')!
+    const breastPlan = computeTrainingZoneRows(
+      goalCs,
+      twoHundredBreast,
+      'SCY',
+      'a-system',
+      'fixed',
+    )
+    const freePlan = computeTrainingZoneRows(goalCs, hundredFree, 'SCY', 'a-system', 'fixed')
+    const breastRows = buildSimplifiedZoneRows(breastPlan, 'SCY', twoHundredBreast)
+    const freeRows = buildSimplifiedZoneRows(freePlan, 'SCY', hundredFree)
+
+    expect(breastRows[3].metricPaceMinCs).not.toBe(freeRows[3].metricPaceMinCs)
   })
 })

@@ -11,7 +11,6 @@ import {
   type ZoneSystemId,
 } from '../data/trainingZoneSystems'
 import { type Course } from '../lib/convert'
-import { exportTrainingZonesToExcel } from '../lib/exportExcel'
 import { getLengthUnitLabel } from '../lib/pacing'
 import { buildPlanShareUrl, type PlanShareState } from '../lib/shareUrl'
 import {
@@ -179,6 +178,10 @@ export function PlanTraining({
                   setGoalTime((prev) => ({ ...prev, [part]: value }))
                   setGoalShowErrors(false)
                 }}
+                onPaste={(parts) => {
+                  setGoalTime(parts)
+                  setGoalShowErrors(false)
+                }}
                 onNormalize={setGoalTime}
                 showErrors={goalShowErrors}
               />
@@ -279,32 +282,32 @@ export function PlanTraining({
             course={course}
             lengthUnit={lengthUnit}
             context={{
+              eventId,
               eventLabel,
               course,
               zoneSystemLabel,
               goalCentiseconds: goalCs,
             }}
             onCopyLink={handleCopyLink}
-            onExport={() =>
-              (() => {
-                setExportError(null)
-                try {
-                  exportTrainingZonesToExcel({
-                    eventLabel,
-                    course,
-                    zoneSystemLabel,
-                    goalCentiseconds: goalCs,
-                    lengthUnit,
-                    plan: zonePlan,
-                    showRaceAverageReference: shouldShowRaceAverageReference(event),
-                  })
-                } catch (error) {
-                  setExportError(
-                    error instanceof Error ? error.message : t('plan.exportError'),
-                  )
-                }
-              })()
-            }
+            onExport={async () => {
+              setExportError(null)
+              try {
+                const { exportTrainingZonesToExcel } = await import('../lib/exportExcel')
+                await exportTrainingZonesToExcel({
+                  eventLabel,
+                  course,
+                  zoneSystemLabel,
+                  goalCentiseconds: goalCs,
+                  lengthUnit,
+                  plan: zonePlan,
+                  showRaceAverageReference: shouldShowRaceAverageReference(event),
+                })
+              } catch (error) {
+                setExportError(
+                  error instanceof Error ? error.message : t('plan.exportError'),
+                )
+              }
+            }}
             onPrint={() => window.print()}
           />
           {exportError && (

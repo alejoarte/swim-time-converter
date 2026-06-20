@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
+  buildManualShareUrl,
   buildPlanShareUrl,
   hasPlanShareQuery,
+  parseManualShareFromSearchParams,
   parsePlanShareFromSearchParams,
   SHARE_QUERY_VERSION,
 } from './shareUrl'
@@ -75,5 +77,40 @@ describe('buildPlanShareUrl', () => {
       'https://example.com/swim-time-converter/',
     )
     expect(new URL(url).searchParams.get('lng')).toBe('en')
+  })
+})
+
+const validManualState = {
+  sourceCourse: 'SCY' as const,
+  entries: [
+    { eventId: '100-free', centiseconds: 6234 },
+    { eventId: '200-free', centiseconds: 12834 },
+  ],
+}
+
+describe('parseManualShareFromSearchParams', () => {
+  it('parses a valid manual conversion share link', () => {
+    const params = new URLSearchParams('convert=1&c=SCY&ids=100-free,200-free&times=6234,12834')
+    expect(parseManualShareFromSearchParams(params)).toEqual(validManualState)
+  })
+
+  it('returns null for mismatched ids and times', () => {
+    const params = new URLSearchParams('convert=1&c=SCY&ids=100-free&times=6234,12834')
+    expect(parseManualShareFromSearchParams(params)).toBeNull()
+  })
+
+  it('returns null for invalid event id', () => {
+    const params = new URLSearchParams('convert=1&c=SCY&ids=999-free&times=6234')
+    expect(parseManualShareFromSearchParams(params)).toBeNull()
+  })
+})
+
+describe('buildManualShareUrl', () => {
+  it('round-trips through parse', () => {
+    const base = 'https://alejoarte.github.io/swim-time-converter/'
+    const url = buildManualShareUrl(validManualState, base)
+    const parsed = new URL(url)
+    expect(parsed.searchParams.get('convert')).toBe('1')
+    expect(parseManualShareFromSearchParams(parsed.searchParams)).toEqual(validManualState)
   })
 })

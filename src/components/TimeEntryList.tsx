@@ -3,7 +3,6 @@ import { compareEventIds, getEventById, getEventLabel } from '../data/events'
 import type { Course } from '../lib/convert'
 import {
   EMPTY_TIME_PARTS,
-  isValidTimeParts,
   type TimePart,
   type TimeParts,
 } from '../lib/timeParse'
@@ -14,6 +13,7 @@ type TimeEntryListProps = {
   selectedIds: string[]
   times: Record<string, TimeParts>
   onTimeChange: (eventId: string, part: TimePart, value: string) => void
+  onTimePaste: (eventId: string, parts: TimeParts) => void
   onTimeNormalize: (eventId: string, parts: TimeParts) => void
   showErrors: boolean
   disabled?: boolean
@@ -24,6 +24,7 @@ export function TimeEntryList({
   selectedIds,
   times,
   onTimeChange,
+  onTimePaste,
   onTimeNormalize,
   showErrors,
   disabled,
@@ -44,6 +45,7 @@ export function TimeEntryList({
   return (
     <section className="card time-entry">
       <h2 className="card-title">{t('timeEntry.heading', { course: sourceCourse })}</h2>
+      <p className="hint time-entry-paste-hint">{t('timeEntry.pasteHint')}</p>
       <ul className="time-entry-list">
         {sortedIds.map((id) => {
           const event = getEventById(id)
@@ -57,6 +59,7 @@ export function TimeEntryList({
                 idPrefix={`time-${id}`}
                 value={value}
                 onChange={(part, v) => onTimeChange(id, part, v)}
+                onPaste={(parts) => onTimePaste(id, parts)}
                 onNormalize={(parts) => onTimeNormalize(id, parts)}
                 disabled={disabled}
                 showErrors={showErrors}
@@ -67,12 +70,4 @@ export function TimeEntryList({
       </ul>
     </section>
   )
-}
-
-export function canGenerate(
-  selectedIds: string[],
-  times: Record<string, TimeParts>,
-): boolean {
-  if (selectedIds.length === 0) return false
-  return selectedIds.every((id) => isValidTimeParts(times[id] ?? EMPTY_TIME_PARTS))
 }
