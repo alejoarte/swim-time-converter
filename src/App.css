@@ -873,6 +873,10 @@ button.secondary:hover:not(:disabled) {
   margin-bottom: 0;
 }
 
+.plan-training > .plan-card {
+  margin-bottom: 1.25rem;
+}
+
 .plan-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
