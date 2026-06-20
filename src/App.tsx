@@ -268,81 +268,81 @@ function App() {
       </header>
 
       <div className={`app${mode === 'plan' ? ' app--plan' : ''}`}>
-      <main id="main-content" ref={entryRef} className="app-main">
-        {mode === 'plan' ? (
-          <Suspense
-            fallback={
-              <p className="hint" role="status">
-                {t('loadingPlan')}
-              </p>
-            }
-          >
-            <PlanTraining
-              initialFromShare={shareBootstrap.planShareInitial}
-              shareParseFailed={shareBootstrap.shareParseFailed}
-            />
-          </Suspense>
-        ) : (
-          <>
-            <div className="card card-grid-2 manual-input-card">
-              <CourseSelector
-                value={sourceCourse}
-                onChange={handleCourseChange}
-                disabled={locked}
-              />
-
-              <EventPicker
-                selectedIds={selectedIds}
-                onChange={handleSelectedChange}
-                disabled={locked}
-              />
-            </div>
-
-            <TimeEntryList
-              sourceCourse={sourceCourse}
-              selectedIds={selectedList}
-              times={times}
-              onTimeChange={handleTimeChange}
-              onTimeNormalize={handleTimeNormalize}
-              showErrors={showErrors}
-              disabled={locked}
-            />
-
-            <div className="generate-section">
-              <button
-                type="button"
-                className="generate-btn"
-                onClick={handleGenerate}
-                disabled={locked || !ready}
-              >
-                {t('generate.button')}
-              </button>
-              {!ready && selectedList.length > 0 && !locked && (
-                <p className="hint">{t('generate.hint')}</p>
-              )}
-            </div>
-
-            <div id="results">
-              {results && (
-                <ResultsTable
-                  results={results}
-                  onEditTimes={handleEditTimes}
-                  onExport={handleExport}
-                />
-              )}
-              {exportError && (
-                <p className="field-error" role="status" aria-live="polite">
-                  {exportError}
+        <main id="main-content" ref={entryRef} className="app-main">
+          {mode === 'plan' ? (
+            <Suspense
+              fallback={
+                <p className="hint" role="status">
+                  {t('loadingPlan')}
                 </p>
-              )}
-            </div>
-          </>
-        )}
-      </main>
+              }
+            >
+              <PlanTraining
+                initialFromShare={shareBootstrap.planShareInitial}
+                shareParseFailed={shareBootstrap.shareParseFailed}
+              />
+            </Suspense>
+          ) : (
+            <>
+              <div className="card card-grid-2 manual-input-card">
+                <CourseSelector
+                  value={sourceCourse}
+                  onChange={handleCourseChange}
+                  disabled={locked}
+                />
 
-      <footer className="app-disclaimer">
-        <p>{t('disclaimer')}</p>
-      </footer>
+                <EventPicker
+                  selectedIds={selectedIds}
+                  onChange={handleSelectedChange}
+                  disabled={locked}
+                />
+              </div>
+
+              <TimeEntryList
+                sourceCourse={sourceCourse}
+                selectedIds={selectedList}
+                times={times}
+                onTimeChange={handleTimeChange}
+                onTimeNormalize={handleTimeNormalize}
+                showErrors={showErrors}
+                disabled={locked}
+              />
+
+              <div className="generate-section">
+                <button
+                  type="button"
+                  className="generate-btn"
+                  onClick={handleGenerate}
+                  disabled={locked || !ready}
+                >
+                  {t('generate.button')}
+                </button>
+                {!ready && selectedList.length > 0 && !locked && (
+                  <p className="hint">{t('generate.hint')}</p>
+                )}
+              </div>
+
+              <div id="results">
+                {results && (
+                  <ResultsTable
+                    results={results}
+                    onEditTimes={handleEditTimes}
+                    onExport={handleExport}
+                  />
+                )}
+                {exportError && (
+                  <p className="field-error" role="status" aria-live="polite">
+                    {exportError}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+        </main>
+
+        <footer className="app-disclaimer">
+          <p>{t('disclaimer')}</p>
+        </footer>
       </div>
     </>
   )

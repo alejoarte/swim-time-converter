@@ -93,9 +93,7 @@ export function PlanTraining({
   }, [event, validGoal, goalCs, course, zoneSystemId, offsetModel, i18n.language])
 
   const goalPacePer100Cs =
-    event && validGoal && goalCs !== null
-      ? goalPacePer100(goalCs, event, course)
-      : null
+    event && validGoal && goalCs !== null ? goalPacePer100(goalCs, event, course) : null
 
   const handleGoalBlur = () => {
     if (!isValidTimeParts(goalTime) && !isTimePartsEmpty(goalTime)) {

@@ -107,9 +107,7 @@ function renderGroupEvents(
     <>
       {sections.map((section) => (
         <div key={section.label ?? 'main'} className="event-list-group">
-          {section.label && (
-            <p className="event-list-group-title">{section.label}</p>
-          )}
+          {section.label && <p className="event-list-group-title">{section.label}</p>}
           <EventListRows
             events={section.events}
             selectedIds={selectedIds}

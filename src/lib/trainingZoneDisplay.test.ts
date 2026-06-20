@@ -50,7 +50,13 @@ describe('pacePer100FromRow', () => {
 describe('buildSimplifiedZoneRows', () => {
   it('returns four grouped rows for a 200-free SCY goal', () => {
     const goalCs = 12834
-    const plan = computeTrainingZoneRows(goalCs, twoHundredFree, 'SCY', 'a-system', 'fixed')
+    const plan = computeTrainingZoneRows(
+      goalCs,
+      twoHundredFree,
+      'SCY',
+      'a-system',
+      'fixed',
+    )
     const rows = buildSimplifiedZoneRows(plan, 'SCY')
 
     expect(rows).toHaveLength(4)
@@ -67,7 +73,13 @@ describe('buildSimplifiedZoneRows', () => {
 
   it('omits metric sub-line when course is not SCY', () => {
     const goalCs = 12834
-    const plan = computeTrainingZoneRows(goalCs, twoHundredFree, 'SCM', 'a-system', 'fixed')
+    const plan = computeTrainingZoneRows(
+      goalCs,
+      twoHundredFree,
+      'SCM',
+      'a-system',
+      'fixed',
+    )
     const rows = buildSimplifiedZoneRows(plan, 'SCM')
 
     expect(rows[0].metricPaceMinCs).toBeNull()

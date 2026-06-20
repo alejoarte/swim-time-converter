@@ -250,7 +250,9 @@ export function TrainingZonesTable({
                       <td>{row.rpeLabel}</td>
                       <td>{row.restGuidance}</td>
                       <td
-                        className={row.isRacePace ? 'training-zones-pace--race' : undefined}
+                        className={
+                          row.isRacePace ? 'training-zones-pace--race' : undefined
+                        }
                       >
                         {formatTime(row.pacePerRepCs)}
                       </td>
@@ -271,7 +273,9 @@ export function TrainingZonesTable({
               </table>
             </div>
 
-            <p className="plan-results-meta plan-results-disclaimer">{getZoneGlossary()}</p>
+            <p className="plan-results-meta plan-results-disclaimer">
+              {getZoneGlossary()}
+            </p>
             <p className="plan-results-meta plan-results-disclaimer">
               {t('table.disclaimer', {
                 paceModel: offsetModelLabel.toLowerCase(),

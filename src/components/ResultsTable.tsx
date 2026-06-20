@@ -40,10 +40,16 @@ export function ResultsTable({ results, onEditTimes, onExport }: ResultsTablePro
             <tr>
               <th>{t('results.eventColumn')}</th>
               {COURSES.map((course) => (
-                <th key={course} className={course === sourceCourse ? 'source-col-header' : undefined}>
+                <th
+                  key={course}
+                  className={course === sourceCourse ? 'source-col-header' : undefined}
+                >
                   {course}
                   {course === sourceCourse && (
-                    <span className="source-marker" title={t('results.sourceMarkerTitle')}>
+                    <span
+                      className="source-marker"
+                      title={t('results.sourceMarkerTitle')}
+                    >
                       *
                     </span>
                   )}
@@ -59,7 +65,9 @@ export function ResultsTable({ results, onEditTimes, onExport }: ResultsTablePro
                   <td
                     key={course}
                     className={
-                      course === row.sourceCourse ? 'source-cell source-cell--value' : undefined
+                      course === row.sourceCourse
+                        ? 'source-cell source-cell--value'
+                        : undefined
                     }
                   >
                     {formatTime(row[course])}
