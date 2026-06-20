@@ -35,6 +35,8 @@ export type TrainingZoneRow = {
 export type TrainingZonePlan = {
   goalPacePer100Cs: number
   goalPacePer50Cs: number
+  goalDisplayPaceCs: number
+  displayPaceDistance: 50 | 100
   practiceRepDistance: number
   offsetModel: OffsetModel
   anchorLabel: string
@@ -50,6 +52,22 @@ export function getPracticeRepDistance(event: SwimEvent): number {
 /** Per-100/50 race average reference is misleading for single-length 50 events. */
 export function shouldShowRaceAverageReference(event: SwimEvent): boolean {
   return event.distance > 50
+}
+
+/** Pace distance used in coach table and goal-pace card labels. */
+export function getDisplayPaceDistance(event: SwimEvent): 50 | 100 {
+  return shouldShowRaceAverageReference(event) ? 100 : 50
+}
+
+/** Goal pace shown in the UI (actual 50 time for 50 events, per-100 average otherwise). */
+export function getGoalDisplayPaceCs(
+  goalCentiseconds: number,
+  event: SwimEvent,
+  course: Course,
+): number {
+  return getDisplayPaceDistance(event) === 50
+    ? goalCentiseconds
+    : goalPacePer100(goalCentiseconds, event, course)
 }
 
 /** Goal race average pace per 100 in centiseconds. */
@@ -83,8 +101,10 @@ export function computeTrainingZoneRows(
 ): TrainingZonePlan {
   const profile = getZoneSystem(systemId)
   const repDistance = getPracticeRepDistance(event)
+  const displayPaceDistance = getDisplayPaceDistance(event)
   const pace100 = goalPacePer100(goalCentiseconds, event, course)
   const pace50 = Math.round(pace100 / 2)
+  const goalDisplayPaceCs = getGoalDisplayPaceCs(goalCentiseconds, event, course)
 
   const rows: TrainingZoneRow[] = profile.zones.map((zone) => {
     const spec = getIntensitySpec(zone.level)
@@ -126,6 +146,8 @@ export function computeTrainingZoneRows(
   return {
     goalPacePer100Cs: pace100,
     goalPacePer50Cs: pace50,
+    goalDisplayPaceCs,
+    displayPaceDistance,
     practiceRepDistance: repDistance,
     offsetModel,
     anchorLabel: getAnchorLabel(),

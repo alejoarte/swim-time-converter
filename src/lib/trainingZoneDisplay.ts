@@ -36,8 +36,16 @@ export type SimplifiedZoneRow = {
   metricPaceMaxCs: number | null
 }
 
+export function normalizePaceForDisplay(
+  pacePerRepCs: number,
+  repDistance: number,
+  displayDistance: number,
+): number {
+  return Math.round(pacePerRepCs * (displayDistance / repDistance))
+}
+
 export function pacePer100FromRow(row: TrainingZoneRow, repDistance: number): number {
-  return Math.round(row.pacePerRepCs * (100 / repDistance))
+  return normalizePaceForDisplay(row.pacePerRepCs, repDistance, 100)
 }
 
 export function formatHrLabel(hrMin: number, hrMax: number): string {
@@ -68,7 +76,9 @@ export function buildSimplifiedZoneRows(
       .map((level) => rowsByLevel.get(level))
       .filter((row): row is TrainingZoneRow => row !== undefined)
 
-    const paces = groupRows.map((row) => pacePer100FromRow(row, repDistance))
+    const paces = groupRows.map((row) =>
+      normalizePaceForDisplay(row.pacePerRepCs, repDistance, plan.displayPaceDistance),
+    )
     const paceMinCs = Math.min(...paces)
     const paceMaxCs = Math.max(...paces)
 

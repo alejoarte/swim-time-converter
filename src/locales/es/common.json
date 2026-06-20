@@ -97,6 +97,7 @@
     "cardSubtitle": "Introduce tu objetivo de carrera para generar zonas de entrenamiento personalizadas.",
     "goalTime": "Tiempo objetivo",
     "goalPace": "Ritmo objetivo",
+    "goalPacePerDistance": "{{time}} / {{distance}}{{unit}}",
     "goalPaceTotal": "{{time}} total",
     "advancedSettings": "Ajustes avanzados",
     "zoneNaming": "Nomenclatura de zonas",

@@ -115,14 +115,14 @@
   },
   "table": {
     "heading": "Zonas de entrenamiento",
-    "subtitle": "Los ritmos son por 100 {{unit}}. Ajústalos según sensación y condiciones.",
+    "subtitle": "Los ritmos son por {{distance}} {{unit}}. Ajústalos según sensación y condiciones.",
     "goalBadge": "Basado en {{event}} – objetivo {{goal}}",
     "hrDisclaimer": "Las zonas de frecuencia cardíaca son estimaciones. Usa tus propios datos para afinarlas. Escucha siempre a tu cuerpo.",
     "showDetails": "Mostrar detalle completo de zonas",
     "hideDetails": "Ocultar detalle completo de zonas",
     "coachColumns": {
       "zone": "Zona",
-      "pace": "Ritmo (por 100{{unit}})",
+      "pace": "Ritmo (por {{distance}}{{unit}})",
       "effort": "Esfuerzo",
       "hr": "Frecuencia cardíaca (% del máx.)",
       "rpe": "RPE (1–10)"

@@ -97,6 +97,7 @@
     "cardSubtitle": "Enter your race goal to generate personalized training zones.",
     "goalTime": "Goal time",
     "goalPace": "Goal Pace",
+    "goalPacePerDistance": "{{time}} / {{distance}}{{unit}}",
     "goalPaceTotal": "{{time}} total",
     "advancedSettings": "Advanced settings",
     "zoneNaming": "Zone naming",

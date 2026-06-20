@@ -4,6 +4,7 @@ import {
   buildSimplifiedZoneRows,
   formatHrLabel,
   formatPaceRange,
+  normalizePaceForDisplay,
   pacePer100FromRow,
 } from './trainingZoneDisplay'
 import { computeTrainingZoneRows } from './trainingZones'
@@ -19,6 +20,16 @@ describe('formatHrLabel', () => {
 describe('formatPaceRange', () => {
   it('formats a pace range with en-dash separator', () => {
     expect(formatPaceRange(6417, 8334)).toBe('1:04.17 – 1:23.34')
+  })
+})
+
+describe('normalizePaceForDisplay', () => {
+  it('returns rep pace unchanged when display distance matches rep distance', () => {
+    expect(normalizePaceForDisplay(2200, 50, 50)).toBe(2200)
+  })
+
+  it('scales rep pace to per-100 when display distance is 100', () => {
+    expect(normalizePaceForDisplay(3209, 50, 100)).toBe(6418)
   })
 })
 
@@ -102,5 +113,19 @@ describe('buildSimplifiedZoneRows', () => {
     const freeRows = buildSimplifiedZoneRows(freePlan, 'SCY', hundredFree)
 
     expect(breastRows[3].metricPaceMinCs).not.toBe(freeRows[3].metricPaceMinCs)
+  })
+
+  it('shows per-50 coach paces for 50-free that match detail-table rep paces', () => {
+    const fiftyFree = getEventById('50-free')!
+    const goalCs = 2200
+    const plan = computeTrainingZoneRows(goalCs, fiftyFree, 'SCY', 'a-system', 'fixed')
+    const rows = buildSimplifiedZoneRows(plan, 'SCY', fiftyFree)
+    const racePaceRow = plan.rows.find((row) => row.level === 'racePace')
+    const coachRacePace = rows.find((row) => row.id === 'racePace')
+
+    expect(plan.displayPaceDistance).toBe(50)
+    expect(coachRacePace?.paceMaxCs).toBe(2200)
+    expect(coachRacePace?.paceMaxCs).toBe(racePaceRow?.pacePerRepCs)
+    expect(coachRacePace?.paceMaxCs).not.toBe(4400)
   })
 })

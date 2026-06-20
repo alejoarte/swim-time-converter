@@ -115,14 +115,14 @@
   },
   "table": {
     "heading": "Training Zones",
-    "subtitle": "Paces are per 100 {{unit}}. Adjust based on feel and conditions.",
+    "subtitle": "Paces are per {{distance}} {{unit}}. Adjust based on feel and conditions.",
     "goalBadge": "Based on {{event}} – {{goal}} Goal",
     "hrDisclaimer": "Heart rate zones are estimates. Use your own data to refine. Always listen to your body.",
     "showDetails": "Show full zone details",
     "hideDetails": "Hide full zone details",
     "coachColumns": {
       "zone": "Zone",
-      "pace": "Pace (per 100{{unit}})",
+      "pace": "Pace (per {{distance}}{{unit}})",
       "effort": "Effort",
       "hr": "Heart Rate (% of Max)",
       "rpe": "RPE (1–10)"

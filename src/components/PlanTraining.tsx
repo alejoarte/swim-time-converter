@@ -15,7 +15,8 @@ import { getLengthUnitLabel } from '../lib/pacing'
 import { buildPlanShareUrl, type PlanShareState } from '../lib/shareUrl'
 import {
   computeTrainingZoneRows,
-  goalPacePer100,
+  getDisplayPaceDistance,
+  getGoalDisplayPaceCs,
   shouldShowRaceAverageReference,
 } from '../lib/trainingZones'
 import {
@@ -91,8 +92,11 @@ export function PlanTraining({
     return computeTrainingZoneRows(goalCs, event, course, zoneSystemId, offsetModel)
   }, [event, validGoal, goalCs, course, zoneSystemId, offsetModel, i18n.language])
 
-  const goalPacePer100Cs =
-    event && validGoal && goalCs !== null ? goalPacePer100(goalCs, event, course) : null
+  const displayPaceDistance = event ? getDisplayPaceDistance(event) : 100
+  const goalDisplayPaceCs =
+    event && validGoal && goalCs !== null
+      ? getGoalDisplayPaceCs(goalCs, event, course)
+      : null
 
   const handleGoalBlur = () => {
     if (!isValidTimeParts(goalTime) && !isTimePartsEmpty(goalTime)) {
@@ -188,12 +192,16 @@ export function PlanTraining({
             </div>
           </section>
 
-          {validGoal && goalPacePer100Cs !== null && goalCs !== null && (
+          {validGoal && goalDisplayPaceCs !== null && goalCs !== null && (
             <aside className="goal-pace-card" aria-label={t('plan.goalPace')}>
               <IconTarget className="goal-pace-card__icon" size={22} />
               <p className="goal-pace-card__label">{t('plan.goalPace')}</p>
               <p className="goal-pace-card__pace">
-                {formatTime(goalPacePer100Cs)} / 100{unitShort}
+                {t('plan.goalPacePerDistance', {
+                  time: formatTime(goalDisplayPaceCs),
+                  distance: displayPaceDistance,
+                  unit: unitShort,
+                })}
               </p>
               <p className="goal-pace-card__total">
                 {t('plan.goalPaceTotal', { time: formatTime(goalCs) })}

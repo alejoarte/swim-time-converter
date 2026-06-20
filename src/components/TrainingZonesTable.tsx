@@ -103,7 +103,7 @@ export function TrainingZonesTable({
           </div>
           <div className="plan-card__heading">
             <h2>{t('table.heading')}</h2>
-            <p>{t('table.subtitle', { unit: unitLabel })}</p>
+            <p>{t('table.subtitle', { distance: plan.displayPaceDistance, unit: unitLabel })}</p>
           </div>
         </div>
 
@@ -166,7 +166,7 @@ export function TrainingZonesTable({
           <thead>
             <tr>
               <th>{t('table.coachColumns.zone')}</th>
-              <th>{t('table.coachColumns.pace', { unit: unitShort })}</th>
+              <th>{t('table.coachColumns.pace', { distance: plan.displayPaceDistance, unit: unitShort })}</th>
               <th>{t('table.coachColumns.effort')}</th>
               <th>{t('table.coachColumns.hr')}</th>
               <th>{t('table.coachColumns.rpe')}</th>
