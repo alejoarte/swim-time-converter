@@ -129,7 +129,9 @@ function getInitialShareBootstrap(): InitialShareBootstrap {
   }
 }
 
-function loadSavedManualState(manualShare: ManualShareState | null): SavedManualState | null {
+function loadSavedManualState(
+  manualShare: ManualShareState | null,
+): SavedManualState | null {
   if (manualShare) return manualShareToSavedState(manualShare)
 
   if (typeof window === 'undefined') return null
@@ -192,11 +194,16 @@ function App() {
 
   useEffect(() => {
     const language =
-      shareBootstrap.manualShareInitial?.language ?? shareBootstrap.planShareInitial?.language
+      shareBootstrap.manualShareInitial?.language ??
+      shareBootstrap.planShareInitial?.language
     if (!language || shareLanguageAppliedRef.current) return
     shareLanguageAppliedRef.current = true
     void i18n.changeLanguage(language)
-  }, [shareBootstrap.manualShareInitial?.language, shareBootstrap.planShareInitial?.language, i18n])
+  }, [
+    shareBootstrap.manualShareInitial?.language,
+    shareBootstrap.planShareInitial?.language,
+    i18n,
+  ])
 
   useEffect(() => {
     return () => {
@@ -371,95 +378,95 @@ function App() {
       </header>
 
       <div className={`app${mode === 'plan' ? ' app--plan' : ''}`}>
-      <main id="main-content" ref={entryRef} className="app-main">
-        {mode === 'plan' ? (
-          <Suspense
-            fallback={
-              <p className="hint" role="status">
-                {t('loadingPlan')}
-              </p>
-            }
-          >
-            <PlanTraining
-              initialFromShare={shareBootstrap.planShareInitial}
-              shareParseFailed={shareBootstrap.shareParseFailed}
-            />
-          </Suspense>
-        ) : (
-          <>
-            {shareBootstrap.manualShareInitial && (
-              <p className="share-banner share-banner--success" role="status">
-                {t('share.conversionLoadedBanner')}
-              </p>
-            )}
-            {shareBootstrap.shareParseFailed && mode === 'manual' && (
-              <p className="share-banner share-banner--warning" role="status">
-                {t('share.conversionInvalidBanner')}
-              </p>
-            )}
-
-            <div className="card card-grid-2 manual-input-card">
-              <CourseSelector value={sourceCourse} onChange={handleCourseChange} />
-
-              <EventPicker selectedIds={selectedIds} onChange={handleSelectedChange} />
-            </div>
-
-            <TimeEntryList
-              sourceCourse={sourceCourse}
-              selectedIds={selectedList}
-              times={times}
-              onTimeChange={handleTimeChange}
-              onTimePaste={handleTimePaste}
-              onTimeNormalize={handleTimeNormalize}
-              showErrors={showTimeErrors}
-            />
-
-            {selectedList.length > 0 && !results && (
-              <p className="hint generate-section">{t('generate.hint')}</p>
-            )}
-
-            <div id="results">
-              {results && (
-                <>
-                  <p className="live-preview-banner" role="status">
-                    {t('results.livePreview')}
-                  </p>
-                  <ResultsTable
-                    results={results}
-                    onExport={handleExport}
-                    onCopyLink={handleCopyLink}
-                    copyStatus={copyStatus}
-                  />
-                </>
-              )}
-              {copyStatus === 'failed' && copyFallbackUrl && (
-                <div className="share-copy-fallback">
-                  <p className="field-error" role="status">
-                    {t('share.copyFailed')}
-                  </p>
-                  <input
-                    className="share-copy-fallback-input"
-                    type="text"
-                    readOnly
-                    value={copyFallbackUrl}
-                    aria-label={t('share.copyConversionLinkAria')}
-                    onFocus={(e) => e.currentTarget.select()}
-                  />
-                </div>
-              )}
-              {exportError && (
-                <p className="field-error" role="status" aria-live="polite">
-                  {exportError}
+        <main id="main-content" ref={entryRef} className="app-main">
+          {mode === 'plan' ? (
+            <Suspense
+              fallback={
+                <p className="hint" role="status">
+                  {t('loadingPlan')}
+                </p>
+              }
+            >
+              <PlanTraining
+                initialFromShare={shareBootstrap.planShareInitial}
+                shareParseFailed={shareBootstrap.shareParseFailed}
+              />
+            </Suspense>
+          ) : (
+            <>
+              {shareBootstrap.manualShareInitial && (
+                <p className="share-banner share-banner--success" role="status">
+                  {t('share.conversionLoadedBanner')}
                 </p>
               )}
-            </div>
-          </>
-        )}
-      </main>
+              {shareBootstrap.shareParseFailed && mode === 'manual' && (
+                <p className="share-banner share-banner--warning" role="status">
+                  {t('share.conversionInvalidBanner')}
+                </p>
+              )}
 
-      <footer className="app-disclaimer">
-        <p>{t('disclaimer')}</p>
-      </footer>
+              <div className="card card-grid-2 manual-input-card">
+                <CourseSelector value={sourceCourse} onChange={handleCourseChange} />
+
+                <EventPicker selectedIds={selectedIds} onChange={handleSelectedChange} />
+              </div>
+
+              <TimeEntryList
+                sourceCourse={sourceCourse}
+                selectedIds={selectedList}
+                times={times}
+                onTimeChange={handleTimeChange}
+                onTimePaste={handleTimePaste}
+                onTimeNormalize={handleTimeNormalize}
+                showErrors={showTimeErrors}
+              />
+
+              {selectedList.length > 0 && !results && (
+                <p className="hint generate-section">{t('generate.hint')}</p>
+              )}
+
+              <div id="results">
+                {results && (
+                  <>
+                    <p className="live-preview-banner" role="status">
+                      {t('results.livePreview')}
+                    </p>
+                    <ResultsTable
+                      results={results}
+                      onExport={handleExport}
+                      onCopyLink={handleCopyLink}
+                      copyStatus={copyStatus}
+                    />
+                  </>
+                )}
+                {copyStatus === 'failed' && copyFallbackUrl && (
+                  <div className="share-copy-fallback">
+                    <p className="field-error" role="status">
+                      {t('share.copyFailed')}
+                    </p>
+                    <input
+                      className="share-copy-fallback-input"
+                      type="text"
+                      readOnly
+                      value={copyFallbackUrl}
+                      aria-label={t('share.copyConversionLinkAria')}
+                      onFocus={(e) => e.currentTarget.select()}
+                    />
+                  </div>
+                )}
+                {exportError && (
+                  <p className="field-error" role="status" aria-live="polite">
+                    {exportError}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
+        </main>
+
+        <footer className="app-disclaimer">
+          <p>{t('disclaimer')}</p>
+        </footer>
       </div>
     </>
   )

@@ -1,6 +1,11 @@
 import { compareEventIds, getEventById } from '../data/events'
 import { convertEntry, type ConversionResult, type Course } from './convert'
-import { EMPTY_TIME_PARTS, isValidTimeParts, partsToCentiseconds, type TimeParts } from './timeParse'
+import {
+  EMPTY_TIME_PARTS,
+  isValidTimeParts,
+  partsToCentiseconds,
+  type TimeParts,
+} from './timeParse'
 
 export function buildConversionResults(
   selectedIds: string[],
@@ -29,6 +34,10 @@ export function hasAnyTimeEntry(
 ): boolean {
   return selectedIds.some((id) => {
     const parts = times[id] ?? EMPTY_TIME_PARTS
-    return parts.minutes.trim() !== '' || parts.seconds.trim() !== '' || parts.hundredths.trim() !== ''
+    return (
+      parts.minutes.trim() !== '' ||
+      parts.seconds.trim() !== '' ||
+      parts.hundredths.trim() !== ''
+    )
   })
 }

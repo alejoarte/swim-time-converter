@@ -176,6 +176,8 @@ describe('convertEntry', () => {
 
 describe('unsupported conversion', () => {
   it('throws for an unsupported pair', () => {
-    expect(() => convertCentiseconds(1000, 'SCY', 'SCY' as Course, hundredFree)).not.toThrow()
+    expect(() =>
+      convertCentiseconds(1000, 'SCY', 'SCY' as Course, hundredFree),
+    ).not.toThrow()
   })
 })

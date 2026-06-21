@@ -90,7 +90,9 @@ const validManualState = {
 
 describe('parseManualShareFromSearchParams', () => {
   it('parses a valid manual conversion share link', () => {
-    const params = new URLSearchParams('convert=1&c=SCY&ids=100-free,200-free&times=6234,12834')
+    const params = new URLSearchParams(
+      'convert=1&c=SCY&ids=100-free,200-free&times=6234,12834',
+    )
     expect(parseManualShareFromSearchParams(params)).toEqual(validManualState)
   })
 
@@ -111,6 +113,8 @@ describe('buildManualShareUrl', () => {
     const url = buildManualShareUrl(validManualState, base)
     const parsed = new URL(url)
     expect(parsed.searchParams.get('convert')).toBe('1')
-    expect(parseManualShareFromSearchParams(parsed.searchParams)).toEqual(validManualState)
+    expect(parseManualShareFromSearchParams(parsed.searchParams)).toEqual(
+      validManualState,
+    )
   })
 })

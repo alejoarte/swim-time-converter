@@ -38,7 +38,9 @@ export function ResultsTable({
           >
             <IconLink size={16} />
             <span>
-              {copyStatus === 'copied' ? t('share.copied') : t('share.copyConversionLink')}
+              {copyStatus === 'copied'
+                ? t('share.copied')
+                : t('share.copyConversionLink')}
             </span>
           </button>
           <button type="button" onClick={onExport}>

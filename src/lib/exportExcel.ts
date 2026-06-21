@@ -42,13 +42,7 @@ function applyConversionSheetLayout(
   sourceCourse: Course,
   headerRowIndex: number,
 ): void {
-  worksheet['!cols'] = [
-    { wch: 22 },
-    { wch: 12 },
-    { wch: 12 },
-    { wch: 12 },
-    { wch: 12 },
-  ]
+  worksheet['!cols'] = [{ wch: 22 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }]
   worksheet['!freeze'] = {
     xSplit: 0,
     ySplit: headerRowIndex + 1,

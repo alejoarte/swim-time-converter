@@ -1,11 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { compareEventIds, getEventById, getEventLabel } from '../data/events'
 import type { Course } from '../lib/convert'
-import {
-  EMPTY_TIME_PARTS,
-  type TimePart,
-  type TimeParts,
-} from '../lib/timeParse'
+import { EMPTY_TIME_PARTS, type TimePart, type TimeParts } from '../lib/timeParse'
 import { TimeFields } from './TimeFields'
 
 type TimeEntryListProps = {

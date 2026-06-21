@@ -37,7 +37,9 @@ describe('App manual conversion flow', () => {
     await user.type(screen.getByLabelText(/^Sec$/i), '02')
     await user.type(screen.getByLabelText(/^Hund$/i), '34')
 
-    expect(await screen.findByRole('heading', { name: /Converted times/i })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('heading', { name: /Converted times/i }),
+    ).toBeInTheDocument()
     expect(screen.getByText('1:10.80')).toBeInTheDocument()
   })
 

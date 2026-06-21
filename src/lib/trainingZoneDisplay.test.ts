@@ -108,7 +108,13 @@ describe('buildSimplifiedZoneRows', () => {
       'a-system',
       'fixed',
     )
-    const freePlan = computeTrainingZoneRows(goalCs, hundredFree, 'SCY', 'a-system', 'fixed')
+    const freePlan = computeTrainingZoneRows(
+      goalCs,
+      hundredFree,
+      'SCY',
+      'a-system',
+      'fixed',
+    )
     const breastRows = buildSimplifiedZoneRows(breastPlan, 'SCY', twoHundredBreast)
     const freeRows = buildSimplifiedZoneRows(freePlan, 'SCY', hundredFree)
 

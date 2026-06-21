@@ -9,7 +9,11 @@ describe('buildConversionResults', () => {
 
   it('returns null when a selected event has an invalid time', () => {
     expect(
-      buildConversionResults(['100-free'], { '100-free': { minutes: '', seconds: '62', hundredths: '' } }, 'SCY'),
+      buildConversionResults(
+        ['100-free'],
+        { '100-free': { minutes: '', seconds: '62', hundredths: '' } },
+        'SCY',
+      ),
     ).toBeNull()
   })
 

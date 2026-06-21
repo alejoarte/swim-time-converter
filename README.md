@@ -76,12 +76,12 @@ This app uses the **Classical (Colorado Timing) course conversion factors** from
 
 ### Conversion factors (`fFactor`)
 
-| Factor        | Value  | When used                          |
-| ------------- | ------ | ---------------------------------- |
-| Standard      | 1.11   | Most events (SCY ↔ LCM/SCM)        |
-| Distance free | 0.8925 | 500y/1000y freestyle               |
-| 1650 free     | 1.02   | SCY 1650 → LCM 1500                |
-| SCM ↔ LCM     | 1.0    | Short ↔ long course meters         |
+| Factor        | Value  | When used                   |
+| ------------- | ------ | --------------------------- |
+| Standard      | 1.11   | Most events (SCY ↔ LCM/SCM) |
+| Distance free | 0.8925 | 500y/1000y freestyle        |
+| 1650 free     | 1.02   | SCY 1650 → LCM 1500         |
+| SCM ↔ LCM     | 1.0    | Short ↔ long course meters  |
 
 Distance factors (0.8925 and 1.02) apply only to **distance freestyle** yard↔meter pairs (e.g. 500y↔400m). **400 IM** uses the standard 1.11 factor plus the medley increment on SCY↔LCM.
 
@@ -89,23 +89,23 @@ Distance factors (0.8925 and 1.02) apply only to **distance freestyle** yard↔m
 
 **Stroke increments** (per 50 yards/meters of stroke, scaled by event distance):
 
-| Stroke  | Increment |
-| ------- | --------- |
-| Fly     | 70        |
-| Back    | 60        |
-| Breast  | 100       |
-| Free    | 80        |
-| IM      | 80        |
+| Stroke | Increment |
+| ------ | --------- |
+| Fly    | 70        |
+| Back   | 60        |
+| Breast | 100       |
+| Free   | 80        |
+| IM     | 80        |
 
 For 100, 200, and 400 events, the stroke increment is multiplied by 2×, 4×, and 8× respectively.
 
 **Distance increments** (SCM ↔ LCM and some SCY ↔ LCM pairs):
 
-| Event pair   | Increment |
-| ------------ | --------- |
-| 500y / 400m  | 640       |
-| 1000y / 800m | 1280      |
-| 1650y / 1500m | 2400     |
+| Event pair    | Increment |
+| ------------- | --------- |
+| 500y / 400m   | 640       |
+| 1000y / 800m  | 1280      |
+| 1650y / 1500m | 2400      |
 
 SCY ↔ SCM conversions use `fIncre = 0`.
 
